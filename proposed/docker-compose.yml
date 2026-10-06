@@ -1,0 +1,133 @@
+name: proposed
+
+services:
+  # 1. ログバッファ：攻撃スパイクを一時的に保持
+  redis:
+    image: redis:alpine
+    command: redis-server --appendonly yes --maxmemory 2gb --maxmemory-policy noeviction
+    restart: always
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "50m"
+        max-file: "5"
+
+  # 2. 高速分析基盤：バルク挿入に強い列指向データベース
+  clickhouse:
+    image: clickhouse/clickhouse-server:latest
+    init: true
+    restart: always
+    volumes:
+      - clickhouse_data:/var/lib/clickhouse
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+      - ./clickhouse-users.xml:/etc/clickhouse-server/users.d/default-user.xml:ro
+    ports:
+      - "8123:8123" # HTTP API
+    environment:
+      # clickhouse-users.xmlがdefaultユーザーにパスワードを要求するため、
+      # ヘルスチェック自身も認証情報を渡す必要がある（2026-08-19、無認証の
+      # ままclickhouse-client実行しHTTP 401→unhealthy固定化を実機で確認）。
+      # 変数名はCLICKHOUSE_USER/CLICKHOUSE_PASSWORDにしないこと: 公式イメージの
+      # entrypoint.shがこの2変数名を予約済みで、CLICKHOUSE_PASSWORDが非空だと
+      # 独自のユーザー自動生成ロジックが発動し、clickhouse-users.xmlのハッシュ
+      # 認証と衝突してクラッシュループする（実機確認、restart_count急増→
+      # exit code 1、docker-entrypoint側の生成処理で失敗）。
+      - CH_HEALTHCHECK_USER=${CLICKHOUSE_USER:-default}
+      - CH_HEALTHCHECK_PASSWORD=${CLICKHOUSE_PASSWORD:-}
+    healthcheck:
+      test: ["CMD-SHELL", "clickhouse-client --user \"$$CH_HEALTHCHECK_USER\" --password \"$$CH_HEALTHCHECK_PASSWORD\" --query 'SELECT 1'"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "100m"
+        max-file: "5"
+
+  # 3. FastAPI 受付レイヤー：非同期キューイング
+  receiver:
+    build:
+      context: ..
+      dockerfile: proposed/receiver/Dockerfile
+    restart: always
+    ports:
+      - "8000:8000"
+    environment:
+      - REDIS_URL=redis://redis:6379
+    depends_on:
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "python -c \"import urllib.request; urllib.request.urlopen('http://localhost:8000/health')\""]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "50m"
+        max-file: "7"
+
+  # 4. Redis → ClickHouse バルクインサートワーカー
+  worker:
+    build:
+      context: ..
+      dockerfile: proposed/receiver/Dockerfile
+    command: ["python", "-m", "src.receiver.worker"]
+    restart: always
+    environment:
+      - REDIS_URL=redis://redis:6379
+      - CLICKHOUSE_URL=http://clickhouse:8123
+      - WORKER_BATCH_SIZE=5000
+      - WORKER_FLUSH_INTERVAL=1.0
+      # CLICKHOUSE_USER/PASSWORDは./.env（gitignore対象、ノードごとに用意）から
+      # 展開される。未設定なら空文字のままclickhouse_request()に渡り、
+      # src/common/clickhouse.pyのCLICKHOUSE_USER未設定時と同じく認証ヘッダー
+      # なしにフォールバックする（既存の無認証ClickHouseに対する非破壊的拡張）。
+      - CLICKHOUSE_USER=${CLICKHOUSE_USER:-}
+      - CLICKHOUSE_PASSWORD=${CLICKHOUSE_PASSWORD:-}
+    depends_on:
+      redis:
+        condition: service_healthy
+      clickhouse:
+        condition: service_healthy
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "50m"
+        max-file: "7"
+
+  # 5. ログ集約・転送：スパイクを受け流すRust製エージェント
+  vector:
+    image: timberio/vector:latest-alpine
+    command: ["--config", "/etc/vector/vector.toml"]
+    volumes:
+      - ./vector.toml:/etc/vector/vector.toml:ro
+      - /var/log/suricata:/var/log/suricata:ro
+      # チェックポイント永続化（doc/known-limitations.md #DDD）。反映手順は
+      # doc/pipeline-spec.md「Vectorチェックポイントの永続化」参照（観測終了後）。
+      - vector_data:/var/lib/vector
+    depends_on:
+      redis:
+        condition: service_healthy
+      receiver:
+        condition: service_healthy
+    restart: always
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "50m"
+        max-file: "5"
+
+volumes:
+  redis_data:
+  clickhouse_data:
+  vector_data:

@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 170" width="960" height="170" role="img" aria-labelledby="t d">
+  <title id="t">Observation platform at a glance</title>
+  <desc id="d">Two sites for 90 days. One-minute heartbeat coverage of 99.98 percent. One of 20 conditions differs significantly from T-Pot/ELK after correction, and the proposed configuration was never worse in any batch.</desc>
+  <style>
+    :root { --bg:#ffffff; --card:#f6f8fa; --edge:#d0d7de; --ink:#1f2328; --muted:#57606a; --accent:#0969da; }
+    @media (prefers-color-scheme: dark) {
+      :root { --bg:#0d1117; --card:#161b22; --edge:#30363d; --ink:#e6edf3; --muted:#9da7b3; --accent:#58a6ff; }
+    }
+    text { font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Noto Sans", sans-serif; fill: var(--ink); }
+    .bg { fill: var(--bg); }
+    .card { fill: var(--card); stroke: var(--edge); stroke-width: 1; }
+    .big { font-size: 44px; font-weight: 700; fill: var(--accent); }
+    .cap { font-size: 14px; font-weight: 600; }
+    .sub { font-size: 12.5px; fill: var(--muted); }
+  </style>
+  <rect class="bg" width="960" height="170"/>
+
+  <rect class="card" x="8" y="8" width="300" height="154" rx="10"/>
+  <text class="big" x="28" y="64">90 days</text>
+  <text class="cap" x="28" y="92">Two sites, continuous observation</text>
+  <text class="sub" x="28" y="114">2026-07-02 to 2026-09-30</text>
+  <text class="sub" x="28" y="132">edge node + central node</text>
+
+  <rect class="card" x="330" y="8" width="300" height="154" rx="10"/>
+  <text class="big" x="350" y="64">99.98%</text>
+  <text class="cap" x="350" y="92">One-minute heartbeat coverage</text>
+  <text class="sub" x="350" y="114">central 99.9853%, edge 99.9830%</text>
+  <text class="sub" x="350" y="132">every gap reported, none removed</text>
+
+  <rect class="card" x="652" y="8" width="300" height="154" rx="10"/>
+  <text class="big" x="672" y="64">1 of 20</text>
+  <text class="cap" x="672" y="92">Significant conditions vs T-Pot/ELK</text>
+  <text class="sub" x="672" y="114">per batch, after correction;</text>
+  <text class="sub" x="672" y="132">proposed never worse in any batch</text>
+</svg>

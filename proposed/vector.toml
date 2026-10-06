@@ -1,0 +1,109 @@
+# self-proving-observation/
+# └── proposed/
+#     └── vector.toml  — Vector パイプライン設定（Suricata → ClickHouse）
+
+# ── Source: Suricata センサーログ読み込み ──
+[sources.log_input]
+type = "file"
+include = ["/var/log/suricata/eve.json"]
+# 既定値102400（100KiB）からの拡張。超過行はERRORログのみで欠損として検知できない
+# （doc/known-limitations.md #NNN・doc/pipeline-spec.md参照）
+max_line_bytes = 1048576
+
+# ── Transform: JSON パース & フィールド抽出 ──
+[transforms.parse_log]
+type = "remap"
+inputs = ["log_input"]
+drop_on_error = true
+drop_on_abort = true
+reroute_dropped = true
+source = '''
+parsed = parse_json(.message) ?? {}
+
+.timestamp = to_string(parsed.timestamp) ?? to_string(now())
+sensor_id_raw = to_string(parsed.src_ip) ?? ""
+.sensor_id = if sensor_id_raw == "" { "unknown" } else { sensor_id_raw }
+.event_type = to_string(parsed.event_type) ?? "unknown"
+.inject_id = to_string(parsed.inject_id) ?? ""
+sev = parsed.alert.severity
+if sev == null {
+  sev = parsed.severity
+}
+if sev == null {
+  sev = 3
+}
+.severity = to_int(sev) ?? 3
+.count = 1
+
+del(.message)
+del(.host)
+del(.source_type)
+del(.file)
+'''
+
+# ── Transform: パースエラーのログ出力用 ──
+[transforms.parse_errors]
+type = "remap"
+inputs = ["parse_log.dropped"]
+source = '''
+msg = to_string(.message) ?? to_string(.) ?? "<empty>"
+log("Parse error on event: " + msg, level: "warn")
+'''
+
+# ── Transform: 1秒ウィンドウで集約（件数合算・severity最大値） ──
+[transforms.aggregator]
+type = "reduce"
+inputs = ["parse_log"]
+group_by = ["sensor_id", "event_type"]
+expire_after_ms = 1000
+
+  [transforms.aggregator.merge_strategies]
+  timestamp = "retain"
+  count = "sum"
+  severity = "max"
+
+# ── Source: 対照実験（spike.py）専用HTTPソース ──
+# doc/pipeline-spec.md「Phase 7」（2026-09-18、doc/roadmap.md Phase 7「合成トラフィックと
+# 実観測データの経路分離」の2026-09-15技術選定）。既存の主経路（parse_log→aggregator→
+# sinks.receiver）は無変更。spike.pyをこのポートへ向ける切替は未実施のため、
+# 現時点では何もPOSTされず常時アイドル。
+[sources.experiment_http]
+type = "http_server"
+address = "0.0.0.0:8010"
+encoding = "json"
+
+# ── Transform: 対照実験トラフィックに traffic_class="synthetic" を付与 ──
+# aggregator（1秒集約、group_by=["sensor_id","event_type"]）を経由させない:
+# 対照実験はinject_id単位の欠損検証（Proposition 4）が前提のため、
+# sensor_id+event_typeでのreduceはinject_idの一意性を破壊してしまう。
+[transforms.tag_synthetic]
+type = "remap"
+inputs = ["experiment_http"]
+source = '''
+.traffic_class = "synthetic"
+'''
+
+# ── Sink: FastAPI 受付レイヤーへ HTTP POST ──
+[sinks.receiver]
+type = "http"
+inputs = ["aggregator", "tag_synthetic"]
+uri = "http://receiver:8000/events"
+method = "post"
+compression = "none"
+
+  [sinks.receiver.encoding]
+  codec = "json"
+
+  [sinks.receiver.batch]
+  max_bytes = 1048576
+  max_events = 100
+  timeout_secs = 1
+
+# ── Sink: パースエラーをファイルに記録 ──
+[sinks.error_log]
+type = "file"
+inputs = ["parse_errors"]
+path = "/var/log/vector/parse_errors.log"
+
+  [sinks.error_log.encoding]
+  codec = "json"

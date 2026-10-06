@@ -1,0 +1,38 @@
+# self-proving-observation/
+# └── requirements.txt
+
+# === インフラ・受付レイヤー ===
+fastapi>=0.111.0
+uvicorn[standard]>=0.30.0
+redis>=5.0.0
+
+# === ML パイプライン ===
+torch>=2.3.0
+numpy>=1.26.0
+shap>=0.45.0
+
+# === 統計検定 ===
+scipy>=1.13.0
+
+# === 可視化 ===
+matplotlib>=3.9.0
+
+# === システムリソース監視 ===
+psutil>=5.9.0
+
+# === Lint & Security ===
+ruff>=0.5.0
+bandit>=1.7.0
+semgrep>=1.70.0
+
+# === Type Check ===
+mypy>=1.10.0
+types-psutil
+scipy-stubs
+
+# === Testing ===
+pytest>=8.0.0
+pytest-asyncio>=0.23.0
+pytest-cov>=5.0.0
+httpx2>=2.0.0
+fakeredis>=2.20.0

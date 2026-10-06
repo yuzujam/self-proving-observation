@@ -1,0 +1,36 @@
+# self-proving-observation/
+# └── edge/
+#     └── docker-compose.yml  — エッジノード（baseline-node / T-Pot）用 Vector 起動設定
+#
+# 起動: docker compose -f edge/docker-compose.yml up -d
+# 前提: edge/.env に PROPOSED_URL を設定すること（gitignore対象、ノードごとに用意）。
+#   例: PROPOSED_URL=http://<proposed-nodeのIP>:8000/events
+# （.exampleテンプレートファイルは置かない方針のため、設定例はここに書く）
+
+name: edge
+
+services:
+  vector:
+    image: timberio/vector:latest-alpine
+    command: ["--config", "/etc/vector/vector.toml"]
+    volumes:
+      - ./vector.toml:/etc/vector/vector.toml:ro
+      # T-Pot の Suricata ログをコンテナ内 /var/log/suricata にマウント
+      - /home/<user>/tpotce/data/suricata/log:/var/log/suricata:ro
+      # チェックポイント永続化（doc/known-limitations.md #DDD）。反映手順は
+      # doc/pipeline-spec.md「Vectorチェックポイントの永続化」参照（観測終了後）。
+      - vector_data:/var/lib/vector
+    environment:
+      - PROPOSED_URL=${PROPOSED_URL}
+      # Vector 0.57.0 で${VAR}形式のconfig内env var補間がデフォルト無効化されたため
+      # (vector.tomlのuri = "${PROPOSED_URL}"が機能しない)、明示的に再有効化する。
+      - VECTOR_DANGEROUSLY_ALLOW_ENV_VAR_INTERPOLATION=true
+    restart: always
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "50m"
+        max-file: "5"
+
+volumes:
+  vector_data:

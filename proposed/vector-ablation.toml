@@ -1,0 +1,105 @@
+# self-proving-observation/
+# └── proposed/
+#     └── vector-ablation.toml  — 集約ウィンドウのアブレーション実験専用Vector設定テンプレート
+#
+# doc/pipeline-spec.md「補強実験: 集約ウィンドウのアブレーション実験」の実装。
+# 本番proposed/vector.tomlとは完全に独立した設定であり、本番の90日間観測パイプライン
+# （redis/clickhouse/receiver/worker、proposed/docker-compose.yml）とは
+# ネットワーク・ボリュームとも非接続（proposed/docker-compose.ablation.yml参照）。
+#
+# 本ファイルはテンプレートであり、Vectorへ直接渡すことは想定しない。
+# scripts/run_ablation_experiment.sh が `__WINDOW_MS__` を実行時の値へsed置換した上で
+# $RESULTS_DIR（コンテナ内 /data としてマウント）へ書き出し、そちらをVectorに読ませる
+# （Vectorの`${VAR}`実行時展開が非文字列コンテキスト＝裸の数値では機能せず
+# TOML parse errorになることを実機で確認したため、この方式に変更した。
+# doc/known-limitations.md参照）。
+#
+# ソース/シンクのパスは常に固定（コンテナ内 /data 配下）のため、実行時パラメータ化は
+# 不要でありプレースホルダ化していない。
+#
+# proposed/vector.tomlとの主な差分:
+#   - expire_after_ms をsed置換でパラメータ化（Vector自身のenv var展開は使わない）
+#   - ソース/シンクをローカルファイルに変更（本番のFastAPI受付へは送信しない）
+#   - 集約前後のレイテンシ計測用に vector_ingest_ts_first/_last を追加
+
+[sources.log_input]
+type = "file"
+include = ["/data/eve.json"]
+
+[transforms.parse_log]
+type = "remap"
+inputs = ["log_input"]
+drop_on_error = true
+drop_on_abort = true
+reroute_dropped = true
+source = '''
+parsed = parse_json(.message) ?? {}
+
+.timestamp = to_string(parsed.timestamp) ?? to_string(now())
+sensor_id_raw = to_string(parsed.src_ip) ?? ""
+.sensor_id = if sensor_id_raw == "" { "unknown" } else { sensor_id_raw }
+.event_type = to_string(parsed.event_type) ?? "unknown"
+.inject_id = to_string(parsed.inject_id) ?? ""
+sev = parsed.alert.severity
+if sev == null {
+  sev = parsed.severity
+}
+if sev == null {
+  sev = 3
+}
+.severity = to_int(sev) ?? 3
+.count = 1
+
+# アブレーション実験専用: 集約待機時間計測用のVector取り込み時刻。
+# reduceのmerge_strategies min/maxは数値型（Integer/Float）のみ対応で、String型は
+# もちろんTimestamp型にも使えない（実機で"expected number value"エラーを確認済み、
+# doc/known-limitations.md参照）。エポックミリ秒のIntegerへ変換して保持する。
+# to_unix_timestamp(now(), unit: "milliseconds")はこの文脈では失敗しえないため
+# `??`フォールバックを付けるとVRLコンパイラが「到達しないエラー処理」として
+# コンパイルエラーにする（実機で確認済み）。
+ingest_ts_ms = to_unix_timestamp(now(), unit: "milliseconds")
+.vector_ingest_ts_first = ingest_ts_ms
+.vector_ingest_ts_last = ingest_ts_ms
+
+del(.message)
+del(.host)
+del(.source_type)
+del(.file)
+'''
+
+[transforms.parse_errors]
+type = "remap"
+inputs = ["parse_log.dropped"]
+source = '''
+msg = to_string(.message) ?? to_string(.) ?? "<empty>"
+log("Ablation parse error on event: " + msg, level: "warn")
+'''
+
+[transforms.aggregator]
+type = "reduce"
+inputs = ["parse_log"]
+group_by = ["sensor_id", "event_type"]
+expire_after_ms = __WINDOW_MS__
+
+  [transforms.aggregator.merge_strategies]
+  timestamp = "retain"
+  count = "sum"
+  severity = "max"
+  vector_ingest_ts_first = "min"
+  vector_ingest_ts_last = "max"
+
+[sinks.ablation_output]
+type = "file"
+inputs = ["aggregator"]
+path = "/data/aggregated_output.jsonl"
+
+  [sinks.ablation_output.encoding]
+  codec = "json"
+
+[sinks.error_log]
+type = "file"
+inputs = ["parse_errors"]
+path = "/data/errors.log"
+
+  [sinks.error_log.encoding]
+  codec = "json"

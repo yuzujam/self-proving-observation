@@ -1,0 +1,32 @@
+# self-proving-observation/
+# └── scripts/
+#     └── logrotate/
+#         └── obs-app  — アプリケーションログローテート設定
+#
+# デプロイ先: 両ノード（proposed-node / baseline-node）— logs/*.log を丸ごと対象にするため
+# ノード共通で同じ内容を配置する。/etc/logrotate.d/ 配下はroot所有の静的ファイルである
+# ことが前提のため、非rootユーザー所有のリポジトリファイルへのシンボリックリンクは避け、
+# コピー配置する（git pullのたびに本番のlogrotate挙動が無審査で変わることも防げる。
+# 内容変更は稀なため更新のたびに再配置が必要になる点は許容、doc/decisions.md参照）:
+#   sudo install -m 0644 $(pwd)/scripts/logrotate/obs-app /etc/logrotate.d/obs-app
+#
+# 対象（ノードにより実際に生成されるファイルは異なるが glob なので両方カバーされる）:
+#   - logs/cron_master.log         (proposed-node: run_cron.sh の起動ログ)
+#   - logs/cron.log                (両ノード: crontab の各ジョブのリダイレクト先)
+#   - logs/backup_clickhouse.log   (proposed-node: 日次ClickHouseバックアップログ)
+#   - logs/fidelity_cron.log       (proposed-node: run_fidelity_cron.sh の起動ログ)
+#   - logs/rotate_and_backup.log   (baseline-node: T-Pot ESローテート & results/ 同期ログ)
+#
+# 保持期間: 30日（90日観測期間中のオペレーションログとして保持）
+
+/home/<user>/self-proving-observation/logs/*.log {
+    daily
+    rotate 30
+    compress
+    delaycompress
+    missingok
+    notifempty
+    dateext
+    dateformat -%Y%m%d
+    create 0644 <user> <user>
+}

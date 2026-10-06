@@ -1,0 +1,56 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 320" width="760" height="320" role="img" aria-labelledby="t d">
+  <title id="t">Fidelity Guard confirming-detection rate</title>
+  <desc id="d">Confirming-detection rate with 95 percent Wilson score intervals, 80 trials per scenario, on synthetic time series with injected drift. Sudden 96.2 percent, gradual 95.0 percent, recurring 91.2 percent.</desc>
+  <style>
+    :root { --bg:#ffffff; --ink:#1f2937; --muted:#4b5563; --grid:#d1d5db; --accent:#1d4ed8; }
+    @media (prefers-color-scheme: dark) {
+      :root { --bg:#0d1117; --ink:#e6edf3; --muted:#a9b4bf; --grid:#30363d; --accent:#79b8ff; }
+    }
+    text { font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Noto Sans", sans-serif; fill: var(--ink); }
+    .bg { fill: var(--bg); }
+    .grid { stroke: var(--grid); stroke-width: 1; }
+    .ci { stroke: var(--accent); stroke-width: 8; stroke-linecap: round; opacity: .45; }
+    .dot { fill: var(--accent); stroke: var(--bg); stroke-width: 2; }
+    .t { font-size: 16px; font-weight: 700; }
+    .s { font-size: 12.5px; fill: var(--muted); }
+    .l { font-size: 14px; font-weight: 600; }
+    .v { font-size: 13px; fill: var(--ink); }
+  </style>
+  <rect class="bg" width="760" height="320"/>
+  <text class="t" x="24" y="30">Fidelity Guard confirms accuracy degradation within 8 windows</text>
+  <text class="s" x="24" y="50">Confirming-detection rate, n = 80 trials per scenario. Synthetic time series with injected drift, not honeypot data.</text>
+
+  <!-- x axis: 80% to 100%, 17.5 px per point, origin x=120 -->
+  <g>
+    <line class="grid" x1="120" y1="78" x2="120" y2="248"/>
+    <line class="grid" x1="207.5" y1="78" x2="207.5" y2="248"/>
+    <line class="grid" x1="295" y1="78" x2="295" y2="248"/>
+    <line class="grid" x1="382.5" y1="78" x2="382.5" y2="248"/>
+    <line class="grid" x1="470" y1="78" x2="470" y2="248"/>
+    <text class="s" x="120" y="268" text-anchor="middle">80%</text>
+    <text class="s" x="207.5" y="268" text-anchor="middle">85%</text>
+    <text class="s" x="295" y="268" text-anchor="middle">90%</text>
+    <text class="s" x="382.5" y="268" text-anchor="middle">95%</text>
+    <text class="s" x="470" y="268" text-anchor="middle">100%</text>
+  </g>
+
+  <!-- sudden: 96.2 [89.5, 98.7] -> x 403.5 / 286.25 / 447.25 -->
+  <g><title>sudden: 77/80 = 96.2%, 95% Wilson interval [89.5%, 98.7%]</title>
+    <text class="l" x="24" y="119">sudden</text>
+    <line class="ci" x1="286.25" y1="115" x2="447.25" y2="115"/><circle class="dot" cx="403.5" cy="115" r="7"/>
+    <text class="v" x="500" y="119">77/80 = 96.2%   [89.5, 98.7]</text></g>
+  <!-- gradual: 95.0 [87.8, 98.0] -> x 382.5 / 256.5 / 435 -->
+  <g><title>gradual: 76/80 = 95.0%, 95% Wilson interval [87.8%, 98.0%]</title>
+    <text class="l" x="24" y="169">gradual</text>
+    <line class="ci" x1="256.5" y1="165" x2="435" y2="165"/><circle class="dot" cx="382.5" cy="165" r="7"/>
+    <text class="v" x="500" y="169">76/80 = 95.0%   [87.8, 98.0]</text></g>
+  <!-- recurring: 91.2 [83.0, 95.7] -> x 316 / 172.5 / 394.75 -->
+  <g><title>recurring: 73/80 = 91.2%, 95% Wilson interval [83.0%, 95.7%]</title>
+    <text class="l" x="24" y="219">recurring</text>
+    <line class="ci" x1="172.5" y1="215" x2="394.75" y2="215"/><circle class="dot" cx="316" cy="215" r="7"/>
+    <text class="v" x="500" y="219">73/80 = 91.2%   [83.0, 95.7]</text></g>
+
+  <text class="s" x="500" y="97">detected / trials = rate   95% interval</text>
+  <text class="s" x="24" y="298">Dot: rate. Bar: 95% Wilson score interval. The axis starts at 80%.</text>
+  <text class="s" x="24" y="314">The original hypothesis, that SHAP changes lead the accuracy drop, was refuted; the detector confirms the drop afterwards.</text>
+</svg>

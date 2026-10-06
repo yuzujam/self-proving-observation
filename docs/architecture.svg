@@ -1,0 +1,69 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 450" width="960" height="450" role="img" aria-labelledby="t d">
+  <title id="t">Observation platform architecture</title>
+  <desc id="d">An edge node aggregates Suricata events in memory every second with Vector and sends only counts and features to a central node. Both nodes send a heartbeat every minute. The central node receives with FastAPI, buffers in Redis, bulk-inserts into ClickHouse with a worker, and analyzes asynchronously with LSTM and SHAP.</desc>
+  <style>
+    :root { --bg:#ffffff; --ink:#1f2937; --muted:#4b5563; --line:#6b7280; --box:#f3f4f6; --accent:#1d4ed8; --accent-bg:#eff6ff; }
+    @media (prefers-color-scheme: dark) {
+      :root { --bg:#0d1117; --ink:#e6edf3; --muted:#a9b4bf; --line:#8b949e; --box:#161b22; --accent:#79b8ff; --accent-bg:#0c2d4d; }
+    }
+    text { font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Noto Sans", sans-serif; fill: var(--ink); }
+    .bg { fill: var(--bg); }
+    .group { fill: none; stroke: var(--line); stroke-width: 1.5; stroke-dasharray: 2 5; }
+    .box { fill: var(--box); stroke: var(--line); stroke-width: 1.5; }
+    .hot { fill: var(--accent-bg); stroke: var(--accent); stroke-width: 1.5; }
+    .h { font-size: 14px; font-weight: 600; }
+    .s { font-size: 12px; fill: var(--muted); }
+    .g { font-size: 13px; font-weight: 600; fill: var(--muted); }
+    .t { font-size: 16px; font-weight: 700; }
+    .flow { fill: none; stroke: var(--ink); stroke-width: 1.8; marker-end: url(#a); }
+    .beat { fill: none; stroke: var(--accent); stroke-width: 1.8; stroke-dasharray: 6 4; marker-end: url(#ab); }
+  </style>
+  <defs>
+    <marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="var(--ink)"/></marker>
+    <marker id="ab" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="var(--accent)"/></marker>
+  </defs>
+  <rect class="bg" width="960" height="450"/>
+  <text class="t" x="24" y="30">Observation platform: two sites, 90 days</text>
+
+  <!-- Edge node -->
+  <rect class="group" x="24" y="52" width="250" height="262" rx="10"/>
+  <text class="g" x="40" y="74">Edge node (VPS)</text>
+  <rect class="box" x="44" y="88" width="210" height="48" rx="6"/>
+  <text class="h" x="56" y="109">Suricata</text><text class="s" x="56" y="126">intrusion-detection events</text>
+  <path class="flow" d="M149 136 V160"/>
+  <rect class="box" x="44" y="162" width="210" height="64" rx="6"/>
+  <text class="h" x="56" y="183">Vector</text><text class="s" x="56" y="200">in-memory aggregation, 1 s</text><text class="s" x="56" y="216">counts and features only</text>
+  <rect class="hot" x="44" y="252" width="210" height="46" rx="6"/>
+  <text class="h" x="56" y="272">Heartbeat</text><text class="s" x="56" y="289">cron, every 1 min</text>
+
+  <!-- Central node -->
+  <rect class="group" x="330" y="52" width="606" height="262" rx="10"/>
+  <text class="g" x="346" y="74">Central node (VPS)</text>
+  <rect class="box" x="350" y="88" width="150" height="62" rx="6"/>
+  <text class="h" x="362" y="110">FastAPI receiver</text><text class="s" x="362" y="128">/events, /heartbeat</text>
+  <rect class="box" x="534" y="88" width="116" height="62" rx="6"/>
+  <text class="h" x="546" y="110">Redis</text><text class="s" x="546" y="128">buffer</text>
+  <rect class="box" x="684" y="88" width="106" height="62" rx="6"/>
+  <text class="h" x="696" y="110">Worker</text><text class="s" x="696" y="128">bulk insert</text>
+  <rect class="box" x="824" y="88" width="94" height="62" rx="6"/>
+  <text class="h" x="836" y="110">ClickHouse</text><text class="s" x="836" y="128">events, beats</text>
+  <path class="flow" d="M500 119 H532"/>
+  <path class="flow" d="M650 119 H682"/>
+  <path class="flow" d="M790 119 H822"/>
+  <rect class="hot" x="350" y="252" width="210" height="46" rx="6"/>
+  <text class="h" x="362" y="272">Heartbeat</text><text class="s" x="362" y="289">cron, every 1 min</text>
+  <path class="beat" d="M455 252 V152"/>
+  <rect class="box" x="620" y="226" width="298" height="72" rx="6"/>
+  <text class="h" x="632" y="248">Asynchronous analysis (separate process)</text><text class="s" x="632" y="266">LSTM + SHAP: Fidelity Guard</text><text class="s" x="632" y="283">never blocks ingestion</text>
+  <path class="flow" d="M871 152 V224"/>
+
+  <!-- Edge to central -->
+  <path class="flow" d="M254 194 H292 V104 H350"/>
+  <path class="beat" d="M254 275 H312 V136 H350"/>
+
+  <!-- Legend and principle -->
+  <path class="flow" d="M24 346 H64"/><text class="s" x="74" y="350">Event stream: counts and features per second. Raw logs are never sent.</text>
+  <path class="beat" d="M24 372 H64"/><text class="s" x="74" y="376">Heartbeat: one row per minute from every site. A failed send sends nothing, so a gap is an absent row.</text>
+  <rect class="hot" x="24" y="394" width="912" height="40" rx="6"/>
+  <text class="h" x="40" y="418">Gaps are detected from absent heartbeat rows and reported as a loss rate. Nothing is interpolated or dropped.</text>
+</svg>

@@ -1,0 +1,71 @@
+[build-system]
+requires = ["setuptools>=42"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "self-proving-observation"
+version = "0.1.0"
+requires-python = ">=3.11"
+dependencies = [
+    # インフラ・受付レイヤー
+    "fastapi>=0.111.0",
+    "uvicorn[standard]>=0.30.0",
+    "redis>=5.0.0",
+    # ML パイプライン
+    "torch>=2.3.0",
+    "numpy>=1.26.0",
+    "shap>=0.45.0",
+    # 統計検定
+    "scipy>=1.13.0",
+    # 可視化
+    "matplotlib>=3.9.0",
+    # システムリソース監視
+    "psutil>=5.9.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "ruff>=0.5.0",
+    "bandit>=1.7.0",
+    "semgrep>=1.70.0",
+    "pytest>=8.0.0",
+    "pytest-asyncio>=0.23.0",
+    "pytest-cov>=5.0.0",
+    # FastAPI TestClient のHTTPクライアント（starlette は httpx から httpx2 へ移行済み）
+    "httpx2>=2.0.0",
+    # worker.py のテスト（tests/test_worker.py）が使うインメモリRedis
+    "fakeredis>=2.20.0",
+    # 静的型検査（mypy --strict、設定は [tool.mypy]）
+    "mypy>=1.10.0",
+    "types-psutil",
+    "scipy-stubs",
+]
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["src*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]
+
+[tool.coverage.run]
+source = ["src"]
+branch = true
+
+[tool.coverage.report]
+show_missing = true
+skip_covered = true
+# 回帰防止の下限（2026-09-24の不具合精査後の実測53%）。テスト追加に合わせて段階的に引き上げる
+fail_under = 50
+
+[tool.mypy]
+files = ["src"]
+strict = true
+warn_unreachable = true
+pretty = true
+
+# shap は型情報（py.typed・スタブ）を提供していないため、import のみ検査対象外とする
+[[tool.mypy.overrides]]
+module = ["shap", "shap.*"]
+ignore_missing_imports = true
