@@ -5,7 +5,7 @@
 # 対照実験（run_cron.sh）は週次のFidelity Guardと同じく複数回の夜間cron実行を
 # 積み増して蓄積する設計だが、run単位の集計（stats.py analyze_batch_results）
 # しか用意されておらず、run横断でプールした検定は行えなかった。
-# known-limitations.md #Xの修正（verification_failed除外）を反映した上で、
+#の修正（verification_failed除外）を反映した上で、
 # 複数のbatch_*ディレクトリ（＝各cron run）を横断してMann-Whitney U検定・
 # 信頼区間を計算する一時的な再解析用スクリプト（対話セッションでの調査目的、
 # 恒久的なCLIツールとしての整備は別途要検討）。
@@ -76,7 +76,7 @@ def main() -> None:
             },
         }
 
-        # CPU/メモリピーク使用率の統計比較。内部指針 1.5・doc/paper-draft.md 5.1が
+        # CPU/メモリピーク使用率の統計比較。論文5.1が
         # 評価指標として掲げMann-Whitney U検定にかける対象と明記しているが、
         # loss_rate_percent以外はこれまで実際にこのスクリプトから計算されたことが
         # なかった（`analyze_condition`は元々metric_key引数を取る汎用実装のため

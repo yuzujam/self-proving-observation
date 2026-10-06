@@ -3,7 +3,7 @@
 # └── scripts/
 #     └── run_multiedge_batch.sh  — マルチエッジ・スケーラビリティ検証の複数条件・複数試行バッチ
 #
-# doc/pipeline-spec.md「補強実験: 合成マルチエッジ・スケーラビリティ検証」の
+#の
 # 統計的検証（Cochran-Armitage傾向検定）に必要な複数条件（EDGE_COUNT）×複数試行を
 # 積み上げる。run_batch_resumable.sh と同じレジューム設計（.done マーカー、
 # BATCH_DIR再指定で再開）を、run_multiedge_experiment.sh の単発実行に対して適用する。
@@ -14,7 +14,7 @@
 #
 #   本番proposed-nodeへ向ける場合は run_multiedge_experiment.sh と同じガードレールが
 #   そのまま効く（PROPOSED_URL に本番IPを指定する場合は OBS_MULTIEDGE_CONFIRM_PROD=1
-#   が必須、内部指針 5.2）。
+#   が必須）。
 
 set -euo pipefail
 
@@ -24,8 +24,8 @@ PROJECT_ROOT="$(dirname "$SCRIPT_DIR")"
 source "$SCRIPT_DIR/lib/common.sh"
 
 # experiment.envが対照実験向けに`export DURATION=120`等を設定している場合、
-# load_experiment_envのsourceが呼び出し元で指定したDURATIONを無条件で上書きしてしまう
-# （`known-limitations.md` #HH）。run_multiedge_experiment.sh側は対策済みだが、この
+# load_experiment_envのsourceが呼び出し元で指定したDURATIONを無条件で上書きしてしまう。
+# run_multiedge_experiment.sh側は対策済みだが、この
 # batchオーケストレーター自身も独立にload_experiment_envを呼んでおり同じ問題を
 # 再発しうる。呼び出し元の値を退避し、load_experiment_env後に優先的に復元する。
 _CALLER_DURATION="${DURATION:-}"
@@ -33,7 +33,7 @@ load_experiment_env
 # 呼び出し元が明示指定しなかった場合、load_experiment_envが設定したexperiment.env
 # 由来の値（対照実験用のDURATION=120等）を引き継がずunsetすることで、後段の
 # `DURATION="${DURATION:-60}"`がこのスクリプト自身の既定値を正しく使えるようにする
-# （`known-limitations.md` #HH 2026-09-04追記: 「明示指定時に優先」だけでは
+# （2026-09-04追記: 「明示指定時に優先」だけでは
 # 「未指定時にスクリプト既定値を使う」ことまでは保証されず、4件目の実害が発生した）。
 if [ -n "$_CALLER_DURATION" ]; then
     DURATION="$_CALLER_DURATION"
@@ -42,7 +42,7 @@ else
 fi
 
 # ── 実験パラメータ（環境変数で上書き可能） ──
-# 既定はdoc/pipeline-spec.mdが候補とするN∈{1,2,4,8}。
+# 既定は想定するエッジ数 N∈{1,2,4,8}。
 IFS=',' read -r -a EDGE_COUNTS <<< "${EDGE_COUNTS:-1,2,4,8}"
 IFS=',' read -r -a EDGE_MODES <<< "${EDGE_MODES:-fixed-total,scaled}"
 TRIALS="${TRIALS:-5}"

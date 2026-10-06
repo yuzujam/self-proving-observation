@@ -24,7 +24,7 @@ def _auth_headers() -> dict[str, str]:
     """CLICKHOUSE_USER/CLICKHOUSE_PASSWORD環境変数から認証ヘッダーを組み立てる。
 
     未設定時は空dict（認証ヘッダーなし）を返し、無認証ClickHouseに対する
-    既存の呼び出し元の挙動を変えない（内部指針 3.4、非破壊的拡張）。
+    既存の呼び出し元の挙動を変えない（非破壊的拡張）。
     """
     user = os.environ.get("CLICKHOUSE_USER")
     if not user:

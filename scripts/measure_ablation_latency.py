@@ -2,7 +2,7 @@
 # └── scripts/
 #     └── measure_ablation_latency.py
 #
-# doc/pipeline-spec.md「補強実験: 集約ウィンドウのアブレーション実験」の一部。
+#の一部。
 # vector-ablation.tomlのfileシンク出力（集約後レコードのNDJSON）をテールし、
 # 行ごとの壁時計到達時刻とvector_ingest_ts_first/_lastの差分から、集約ウィンドウが
 # 追加する待機時間を実測する。あわせてcount合計を突合し、集約処理自体の

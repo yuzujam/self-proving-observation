@@ -2,10 +2,10 @@
 # └── tests/
 #     └── test_backup_prune_reconciliation.py
 #
-# doc/known-limitations.md #ZZ: backup_clickhouse.sh の日次バックアップは、UTC日が終わった
+# backup_clickhouse.sh の日次バックアップは、UTC日が終わった
 # 直後（00:00 UTC = 02:00 CEST）に前日分を対象に走る。Vectorのreduce（アイドル待ち）・
 # バッチ・ワーカーの遅延で、日末の数秒分の行はバックアップ後に挿入されうる。ところが
-# prune_verified_threat_events（内部指針 5.1、7日以上前の日付をローカルから間引く）は
+# prune_verified_threat_events（7日以上前の日付をローカルから間引く）は
 # rclone checkの結果しか見ず、「バックアップ時の件数」と「現在のローカル件数」を照合して
 # いなかったため、バックアップに入っていない後着行までローカルから消えうる状態だった。
 #

@@ -3,10 +3,9 @@
 # └── scripts/
 #     └── run_multiedge_experiment.sh  — 合成マルチエッジ・スケーラビリティ検証（単発実行）
 #
-# doc/pipeline-spec.md「補強実験: 合成マルチエッジ・スケーラビリティ検証」の実装。
 # 90日間の実地観測・対照実験がエッジ1台:中央1台の構成のみで、複数エッジノードが
 # 同時に稼働した場合の中央受付層（FastAPI+Redis+ClickHouse）のスケーラビリティを
-# 未検証のままにしている問題（doc/known-limitations.md #8）への対処。
+# 未検証のままにしている問題への対処。
 #
 # 既存コンポーネント（src/generator/spike.py・src/measure/loss_rate.py）は無変更で
 # 再利用する。「仮想エッジ」は同一ホスト上で並行実行する複数の spike.py プロセスで
@@ -14,9 +13,9 @@
 #
 # 本スクリプトは1回の (EDGE_COUNT, EDGE_MODE) 条件を単発実行するのみ。
 # 複数条件・複数試行のバッチ化（run_batch_resumable.sh 相当の中断・再開対応）は
-# 未実装（doc/pipeline-spec.md 参照、今後の課題）。
+# 未実装（参照、今後の課題）。
 #
-# 実行前に必ず確認すること（内部指針 5.2）:
+# 実行前に必ず確認すること:
 #   本番proposed-nodeのエンドポイントへ向けて実行すると、90日間観測本体と
 #   同じ受付・書き込みパイプラインへ合成負荷をかけることになる。本番へ向ける
 #   場合は、観測への影響（一時的な負荷増）を説明した上で個別に確認を得ること。
@@ -31,15 +30,15 @@ PROJECT_ROOT="$(dirname "$SCRIPT_DIR")"
 source "$SCRIPT_DIR/lib/common.sh"
 
 # experiment.envが対照実験向けに`export DURATION=120`等を設定している場合、
-# load_experiment_envのsourceが呼び出し元で指定したDURATIONを無条件で上書きしてしまう
-# （`known-limitations.md` #HH）。呼び出し元の値を退避し、load_experiment_env後に
+# load_experiment_envのsourceが呼び出し元で指定したDURATIONを無条件で上書きしてしまう。
+# 呼び出し元の値を退避し、load_experiment_env後に
 # 優先的に復元することで防ぐ（既存の単発対照実験系スクリプトの挙動は無変更）。
 _CALLER_DURATION="${DURATION:-}"
 load_experiment_env
 # 呼び出し元が明示指定しなかった場合、load_experiment_envが設定したexperiment.env
 # 由来の値（対照実験用のDURATION=120等）を引き継がずunsetすることで、後段の
 # `DURATION="${DURATION:-60}"`がこのスクリプト自身の既定値を正しく使えるようにする
-# （`known-limitations.md` #HH 2026-09-04追記: 「明示指定時に優先」だけでは
+# （2026-09-04追記: 「明示指定時に優先」だけでは
 # 「未指定時にスクリプト既定値を使う」ことまでは保証されず、4件目の実害が発生した）。
 if [ -n "$_CALLER_DURATION" ]; then
     DURATION="$_CALLER_DURATION"

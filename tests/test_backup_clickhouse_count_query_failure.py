@@ -2,9 +2,9 @@
 # └── tests/
 #     └── test_backup_clickhouse_count_query_failure.py
 #
-# doc/known-limitations.md #T: backup_clickhouse.shのbackup_table()は
+# backup_clickhouse.shのbackup_tableは
 # 件数取得クエリが失敗しても`rows=0`にフォールバックしており、「バックアップ
-# 成功・0件」と誤記録され内部指針 5.1のprune安全条件（S3-compatible object storage整合性確認
+# 成功・0件」と誤記録され、prune安全条件（S3-compatible object storage整合性確認
 # 済みの日付のみローカルthreat_eventsを削除）をすり抜けうる状態だった。
 # 修正後は「件数クエリ自体の失敗（rowsを空文字のまま保持）」と「クエリは
 # 成功し真に0件（rows="0"）」を区別する。この区別が将来のリファクタで
@@ -109,8 +109,8 @@ _COUNT_QUERY_SUCCEEDS_WITH_TRUE_ZERO = textwrap.dedent(
 def test_count_query_failure_is_not_recorded_as_success(tmp_path):
     output = _run_backup_table(tmp_path, _COUNT_QUERY_FAILS)
     assert "status=export_failed" in output, (
-        "件数取得クエリ自体が失敗しているのに success として記録されています"
-        f"（doc/known-limitations.md #T参照）。output={output!r}"
+        "件数取得クエリ自体が失敗しているのに success として記録されています。"
+        f"output={output!r}"
     )
     assert "status=success" not in output
 

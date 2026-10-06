@@ -3,7 +3,6 @@
 # └── scripts/
 #     └── run_ablation_experiment.sh  — 集約ウィンドウのアブレーション実験（単発実行）
 #
-# doc/pipeline-spec.md「補強実験: 集約ウィンドウのアブレーション実験」の実装。
 # proposed/docker-compose.ablation.yml が構築するVectorコンテナ1つのみの隔離スタックへ、
 # src/generator/spike.py --file-output でSuricata eve.json互換のNDJSONを直接投入し、
 # 集約ウィンドウ長（WINDOW_MS）ごとの正確性（イベント取りこぼしの有無）とレイテンシを
@@ -21,15 +20,15 @@ PROJECT_ROOT="$(dirname "$SCRIPT_DIR")"
 source "$SCRIPT_DIR/lib/common.sh"
 
 # experiment.envが対照実験向けに`export DURATION=120`等を設定している場合、
-# load_experiment_envのsourceが呼び出し元で指定したDURATIONを無条件で上書きしてしまう
-# （known-limitations.md #HHと同型の問題）。呼び出し元の値を退避し、
+# load_experiment_envのsourceが呼び出し元で指定したDURATIONを無条件で上書きしてしまう。
+# 呼び出し元の値を退避し、
 # load_experiment_env後に優先的に復元することで防ぐ。
 _CALLER_DURATION="${DURATION:-}"
 load_experiment_env
 # 呼び出し元が明示指定しなかった場合、load_experiment_envが設定したexperiment.env
 # 由来の値（対照実験用のDURATION=120等）を引き継がずunsetすることで、後段の
 # `DURATION="${DURATION:-60}"`がこのスクリプト自身の既定値を正しく使えるようにする
-# （`known-limitations.md` #HH 2026-09-04追記: 「明示指定時に優先」だけでは
+# （2026-09-04追記: 「明示指定時に優先」だけでは
 # 「未指定時にスクリプト既定値を使う」ことまでは保証されず、4件目の実害が発生した）。
 if [ -n "$_CALLER_DURATION" ]; then
     DURATION="$_CALLER_DURATION"
@@ -44,7 +43,7 @@ DURATION="${DURATION:-60}"
 PATTERN="${PATTERN:-flat}"
 # 既定の送信元IP生成（ほぼユニーク）だとgroup_by=[sensor_id,event_type]が
 # ほとんど1グループ=1イベントになり、reduceが実際に複数イベントを集約する
-# 場面を検証できない（2026-09-03の実機テストで発覚、doc/known-limitations.md参照）。
+# 場面を検証できない（2026-09-03の実機テストで発覚）。
 # 小さなプールに限定し、同一キーの繰り返し出現を作る。
 SENSOR_POOL_SIZE="${SENSOR_POOL_SIZE:-5}"
 COMPOSE_FILE="$PROJECT_ROOT/proposed/docker-compose.ablation.yml"
@@ -68,7 +67,7 @@ mkdir -p "$RESULTS_DIR"
 # 個別のdocker composeコマンド呼び出しに前置するだけでは、この後バックグラウンド
 # ジョブとして起動するresource.py（内部でも`docker compose ps -q`を呼ぶ）に
 # 環境変数が伝播せず、コンテナ検出が常に失敗してリソース計測がホスト全体の
-# 値へサイレントにフォールバックし続けていた（doc/known-limitations.md参照）。
+# 値へサイレントにフォールバックし続けていた。
 export ABLATION_DATA_DIR="$RESULTS_DIR"
 
 EVE_LOG="$RESULTS_DIR/eve.json"
@@ -77,7 +76,7 @@ touch "$EVE_LOG"
 
 # Vector自身の実行時env var展開は非文字列コンテキスト（裸の数値）では機能しない
 # ことを実機で確認したため、WINDOW_MSはsedでテンプレートに直接埋め込んだ実体の
-# TOMLを$RESULTS_DIR（コンテナ内/dataとしてマウント）へ生成する（doc/known-limitations.md参照）。
+# TOMLを$RESULTS_DIR（コンテナ内/dataとしてマウント）へ生成する。
 sed "s/__WINDOW_MS__/$WINDOW_MS/" "$PROJECT_ROOT/proposed/vector-ablation.toml" \
     > "$RESULTS_DIR/vector-ablation.generated.toml"
 

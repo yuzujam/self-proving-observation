@@ -17,8 +17,7 @@ services:
       - ./vector.toml:/etc/vector/vector.toml:ro
       # T-Pot の Suricata ログをコンテナ内 /var/log/suricata にマウント
       - /home/<user>/tpotce/data/suricata/log:/var/log/suricata:ro
-      # チェックポイント永続化（doc/known-limitations.md #DDD）。反映手順は
-      # doc/pipeline-spec.md「Vectorチェックポイントの永続化」参照（観測終了後）。
+      # チェックポイントの永続化（反映は観測終了後）。
       - vector_data:/var/lib/vector
     environment:
       - PROPOSED_URL=${PROPOSED_URL}

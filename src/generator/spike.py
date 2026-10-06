@@ -83,8 +83,8 @@ def generate_event(sequence_num: int, sensor_pool_size: int = 0) -> tuple[dict[s
     送信元IPを生成する（対照実験の欠損率計測はinject_id単位の突合のため、
     送信元IPの多様性自体は結果に影響しない）。0より大きい場合は送信元IPを
     その個数の小さなプールに限定し、同一(sensor_id, event_type)の組が
-    短時間に繰り返し出現するようにする（doc/pipeline-spec.md「補強実験:
-    集約ウィンドウのアブレーション実験」で、Vectorのreduce transformが
+    短時間に繰り返し出現するようにする（集約ウィンドウの
+    アブレーション実験で、Vectorのreduce transformが
     実際に複数イベントを1レコードへ集約する場面を検証するために必要）。
     """
     inject_id = str(uuid.uuid4())
@@ -244,7 +244,7 @@ def run_generator_file(
     sensor_pool_size: int = 0,
 ) -> None:
     """生成イベントをHTTP送信せず、Suricata eve.json互換のNDJSONとしてファイルへ
-    追記する。doc/pipeline-spec.md「補強実験: 集約ウィンドウのアブレーション実験」向けに
+    追記する。集約ウィンドウのアブレーション実験向けに
     Vectorのfileソースへ直接投入するための経路で、既存のHTTP送信経路（run_generator）
     とは独立しており、そちらのロジック・副作用には一切触れない。
 
@@ -301,7 +301,7 @@ def main() -> None:
     parser.add_argument(
         "--file-output", default="",
         help="指定時はHTTP送信せず、Suricata eve.json互換NDJSONとしてこのパスへ追記する"
-        "（doc/pipeline-spec.md「補強実験: 集約ウィンドウのアブレーション実験」向け）",
+        "（集約ウィンドウのアブレーション実験向け）",
     )
     parser.add_argument(
         "--sensor-pool-size", type=int, default=0,

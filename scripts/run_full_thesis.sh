@@ -41,7 +41,7 @@ load_experiment_env
 # run_cron.sh 側の /tmp/obs_experiment.lock は run_cron.sh 自身の二重起動しか
 # 防げず、本スクリプトを直接手動実行（例: --resume）した場合はすり抜ける
 # （2026-07-08、cron起動分と手動--resume起動分が同一batch_dirに対して並行実行し、
-# 同一trialのデータを競合上書きする事故が発生。doc/known-limitations.md参照）。
+# 同一trialのデータを競合上書きする事故が発生）。
 # 起動経路によらず本スクリプト自体を多重起動禁止にする。
 FULL_THESIS_LOCK="/tmp/obs_full_thesis.lock"
 exec 200>"$FULL_THESIS_LOCK"
@@ -228,7 +228,7 @@ FIDELITY_START=$(date +%s)
 # 本呼び出しは従来--seedを渡しておらずrun_fidelity_experiment.pyの既定値
 # seed=42が毎回使われていたため、run_cron.sh経由で本スクリプトが繰り返し
 # 実行される20回分すべてでthesis_*/fidelity/が同一データの複製になっていた
-# （known-limitations.md #Vと同型だが#Vの修正対象外だった別経路、2026-08-03発見）。
+# （2026-08-03発見）。
 # 週次のrun_fidelity_cron.sh（FIDELITY_SEED_BASE=42から+10刻み）とseed空間が
 # 衝突しないよう、エポック秒ベースの値を用いる。
 THESIS_FIDELITY_SEED="${THESIS_FIDELITY_SEED:-$FIDELITY_START}"
@@ -248,7 +248,7 @@ log "  Fidelity Guard 所要時間: $(( FIDELITY_ELAPSED / 60 ))m $(( FIDELITY_E
 log "  結果: $FIDELITY_DIR"
 
 # Fidelity Guard の LaTeX 表を生成
-# confirming_detected/detection_lag（確認指標、doc/decisions.md）を用いた表を
+# confirming_detected/detection_lag（確認指標）を用いた表を
 # 論文投稿用として生成する。旧指標 fidelity_leads ベースの表（export_latex_fidelity_table）
 # は後方互換のため関数自体は残しているが、本スクリプトからは呼び出さない。
 if [ -f "$FIDELITY_DIR/fidelity_summary.json" ]; then

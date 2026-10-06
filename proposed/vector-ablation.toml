@@ -2,7 +2,6 @@
 # └── proposed/
 #     └── vector-ablation.toml  — 集約ウィンドウのアブレーション実験専用Vector設定テンプレート
 #
-# doc/pipeline-spec.md「補強実験: 集約ウィンドウのアブレーション実験」の実装。
 # 本番proposed/vector.tomlとは完全に独立した設定であり、本番の90日間観測パイプライン
 # （redis/clickhouse/receiver/worker、proposed/docker-compose.yml）とは
 # ネットワーク・ボリュームとも非接続（proposed/docker-compose.ablation.yml参照）。
@@ -11,8 +10,7 @@
 # scripts/run_ablation_experiment.sh が `__WINDOW_MS__` を実行時の値へsed置換した上で
 # $RESULTS_DIR（コンテナ内 /data としてマウント）へ書き出し、そちらをVectorに読ませる
 # （Vectorの`${VAR}`実行時展開が非文字列コンテキスト＝裸の数値では機能せず
-# TOML parse errorになることを実機で確認したため、この方式に変更した。
-# doc/known-limitations.md参照）。
+# TOML parse errorになることを実機で確認したため、この方式に変更した）。
 #
 # ソース/シンクのパスは常に固定（コンテナ内 /data 配下）のため、実行時パラメータ化は
 # 不要でありプレースホルダ化していない。
@@ -52,8 +50,8 @@ if sev == null {
 
 # アブレーション実験専用: 集約待機時間計測用のVector取り込み時刻。
 # reduceのmerge_strategies min/maxは数値型（Integer/Float）のみ対応で、String型は
-# もちろんTimestamp型にも使えない（実機で"expected number value"エラーを確認済み、
-# doc/known-limitations.md参照）。エポックミリ秒のIntegerへ変換して保持する。
+# もちろんTimestamp型にも使えない（実機で"expected number value"エラーを確認済み）。
+# エポックミリ秒のIntegerへ変換して保持する。
 # to_unix_timestamp(now(), unit: "milliseconds")はこの文脈では失敗しえないため
 # `??`フォールバックを付けるとVRLコンパイラが「到達しないエラー処理」として
 # コンパイルエラーにする（実機で確認済み）。

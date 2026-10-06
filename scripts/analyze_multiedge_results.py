@@ -5,9 +5,9 @@
 # scripts/run_multiedge_experiment.sh が生成する results/multiedge_* ディレクトリ群
 # （複数のEDGE_COUNT・複数試行を横断して蓄積したもの）を集計し、
 # 「仮想エッジ数(N)が増えるほど中央受付層の欠損発生率が用量反応的に悪化するか」を
-# Cochran-Armitage傾向検定で評価する（doc/pipeline-spec.md「補強実験」節）。
-# 既存のsrc/measure/stats.pyのcochran_armitage_trend_test（doc/decisions.md
-# 2026-08-14で導入済み）をRPS軸ではなくエッジ数(N)軸で再利用する、対話セッション
+# Cochran-Armitage傾向検定で評価する。
+# 既存のsrc/measure/stats.pyのcochran_armitage_trend_test（2026-08-14導入済み）
+# をRPS軸ではなくエッジ数(N)軸で再利用する、対話セッション
 # 向けの一時的な再解析スクリプト（pool_control_experiment_stats.pyと同種の位置づけ）。
 
 import argparse
@@ -63,8 +63,7 @@ def group_by_mode_and_count(trials: list[dict]) -> dict[str, dict[int, list[dict
 
 def trend_test_by_mode(trials: list[dict]) -> dict:
     """edge_mode（fixed-total / scaled）ごとに、エッジ数(N)を用量とした
-    Cochran-Armitage傾向検定を行う。verification_failedな試行は分母から除外する
-    （doc/known-limitations.md #Xと同じ扱い方針）。
+    Cochran-Armitage傾向検定を行う。verification_failedな試行は分母から除外する。
     """
     grouped = group_by_mode_and_count(trials)
     result = {}

@@ -2,7 +2,7 @@
 # └── tests/
 #     └── test_fidelity_guard.py
 #
-# doc/known-limitations.md #WW: FidelityGuard.monitor_drift() は、SHAPベースライン確立前の
+# FidelityGuard.monitor_drift は、SHAPベースライン確立前の
 # 窓で `moving_avg < effective_threshold`（numpy.float64同士の比較）をそのまま返していた。
 # 結果は numpy.bool_ で、run_fidelity_experiment.py の json.dump(default=str) が
 # 文字列 "False" として書き出す（ベースライン確立後の窓はPythonのboolなので `false`）。

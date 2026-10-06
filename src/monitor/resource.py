@@ -117,7 +117,7 @@ def collect_docker_stats_ssh(
 
     パイプ区切りで出力させることでコンテナ名・メモリ値内のスペースと衝突しない。
     baseline-nodeはポート22がT-Potのデコイ（本物の管理シェルではない）のため、
-    呼び出し元でssh_portに実際の管理用ポートを指定する必要がある（内部指針 5.2）。
+    呼び出し元でssh_portに実際の管理用ポートを指定する必要がある。
     """
     remote_cmd = (
         "docker stats --no-stream "

@@ -10,8 +10,7 @@
 [sources.log_input]
 type = "file"
 include = ["/var/log/suricata/eve.json"]
-# 既定値102400（100KiB）からの拡張。超過行はERRORログのみで欠損として検知できない
-# （doc/known-limitations.md #NNN・doc/pipeline-spec.md参照）
+# 既定値102400（100KiB）からの拡張。超過行はERRORログのみで欠損として検知できない。
 max_line_bytes = 1048576
 
 # ── Transform: JSON パース & フィールド抽出 ──
@@ -67,8 +66,7 @@ expire_after_ms = 1000
   severity = "max"
 
 # ── Source: 対照実験（spike.py）専用HTTPソース ──
-# doc/pipeline-spec.md「Phase 7」（2026-09-18）。proposed/vector.tomlとsource/transform
-# 共通のためこちらにも同一定義を置く（tests/test_vector_config_consistency.py）。
+# proposed/vector.tomlとsource/transformが共通のため、こちらにも同一定義を置く（tests/test_vector_config_consistency.py）。
 # 既存の主経路（parse_log→aggregator→sinks.receiver）は無変更。spike.pyをこのポートへ
 # 向ける切替は未実施のため、現時点では何もPOSTされず常時アイドル。
 [sources.experiment_http]

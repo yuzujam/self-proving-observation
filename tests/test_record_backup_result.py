@@ -2,11 +2,11 @@
 # └── tests/
 #     └── test_record_backup_result.py
 #
-# doc/known-limitations.md #FF: record_backup_result.py の main() は
+# record_backup_result.py の main は
 # backup_log への INSERT が失敗しても例外を握りつぶし常に exit 0 で戻って
 # おり、呼び出し元（backup_clickhouse.sh・rotate_and_backup.sh、計3箇所）が
 # 戻り値経由で失敗を検知できなかった（backup_log自体が自己証明型完全性
-# 保証の監査台帳であるため、#9が総括する「検証メカニズム自体がサイレント
+# 保証の監査台帳であるためが総括する「検証メカニズム自体がサイレント
 # に壊れる」構造的パターンの一つ）。修正後は _record() がbool、main()が
 # 失敗時にsys.exit(1)を返す契約になっている。この契約が将来のリファクタ
 # で再び失われていないかを、実ClickHouseに依存せず検証する。
@@ -73,7 +73,7 @@ class TestMainSurfacesFailure:
                 record_backup_result.main()
         assert exc_info.value.code == 1, (
             "backup_log INSERT失敗がexit 0のまま呼び出し元から検知不能に"
-            f"なっています（doc/known-limitations.md #FF参照）。exit code={exc_info.value.code}"
+            f"なっています。exit code={exc_info.value.code}"
         )
 
     def test_main_does_not_exit_on_insert_success(self, monkeypatch):

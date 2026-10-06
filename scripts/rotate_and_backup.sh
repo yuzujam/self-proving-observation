@@ -21,8 +21,8 @@ source "$SCRIPT_DIR/lib/common.sh"
 # 上書きされないよう呼び出し元の値を退避しておき、読み込み後に復元する。
 _CLICKHOUSE_URL_FROM_CALLER="${CLICKHOUSE_URL:-}"
 # 素の`source`ではexperiment.envが`export`なしで書かれていた場合に子プロセス
-# （record_backup_result.py の CLICKHOUSE_USER/PASSWORD）へ伝わらない（#GG・#II）。
-# 他のスクリプトと同じく自動exportする共通関数を使う（doc/known-limitations.md #CCC）。
+# （record_backup_result.py の CLICKHOUSE_USER/PASSWORD）へ伝わらない。
+# 他のスクリプトと同じく自動exportする共通関数を使う。
 load_experiment_env
 if [[ -n "$_CLICKHOUSE_URL_FROM_CALLER" ]]; then
     CLICKHOUSE_URL="$_CLICKHOUSE_URL_FROM_CALLER"
@@ -51,7 +51,7 @@ FAILURES=()
 # backup_log テーブルへ成否を記録（ClickHouse が利用可能な場合のみ）
 # $1: テーブル/対象名  $2: status  $3: row_count  $4: error_message
 #
-# doc/known-limitations.md #FF: 以前は`2>/dev/null || true`でexit code・
+# 以前は`2>/dev/null || true`でexit code・
 # stderr双方を無条件に握りつぶしており、backup_log記録自体の失敗が
 # FAILURES/通知のどちらにも一切現れなかった（CLICKHOUSE_URL未設定時の
 # 意図的スキップとは区別できていなかった）。URL未設定時のスキップは維持し
@@ -64,7 +64,7 @@ record_backup_result() {
         --backup-date "$BACKUP_DATE" --node-id "$NODE_ID" \
         --clickhouse-url "${CLICKHOUSE_URL:-}" --quiet \
         2>/dev/null; then
-        FAILURES+=("${target}: backup_logへの記録に失敗（status=${status}を記録できず、doc/known-limitations.md #FF）")
+        FAILURES+=("${target}: backup_logへの記録に失敗（status=${status}を記録できず）")
     fi
 }
 
@@ -75,7 +75,7 @@ record_backup_result() {
 # gzipのもので、pipefailなしではextract_features.pyの失敗（ES障害等）がマスク
 # される。さらにgzipは空入力でも20バイトの有効なファイルを作るため `[[ -s f ]]`
 # も通り、「抽出失敗→空のバックアップをアップロード→ESインデックスを不可逆に
-# 削除」という経路が成立していた（doc/known-limitations.md #RR）。ここでは
+# 削除」という経路が成立していた。ここでは
 #   1. 抽出プロセス自体の終了ステータス（pipefail）
 #   2. 展開後にヘッダ行+データ行が1行以上あること
 # の両方を満たした場合のみ成功とする。
@@ -114,7 +114,7 @@ if rclone copy "$RESULTS_DIR" "${REMOTE}:${BUCKET}/results/" \
     # ローカルから削除する（未設定時は従来通り何もしない = 既存ノードの挙動を変えない）。
     # 対照実験バッチ（results/batch_YYYYMMDD_*）はローカルに残り続けると
     # 1回あたり数十GBに達し得るため、中央ノードでのディスク枯渇を防ぐ。
-    # ablation_*・multiedge_*（doc/pipeline-spec.md「補強実験」節、2026-09-03追加）は
+    # ablation_*・multiedge_*（2026-09-03追加）は
     # 単発実行のディレクトリ名がプレフィックス1語（例: ablation_20260903_...）である一方、
     # バッチ実行の入れ物ディレクトリはプレフィックス2語（例: ablation_batch_20260903_...）
     # であり、旧来の「最初の_までを削って先頭8文字」という抽出方法ではbatch側の日付を
@@ -161,7 +161,6 @@ if rclone copy "$RESULTS_DIR" "${REMOTE}:${BUCKET}/results/" \
     #     による検知と1日1回の解放の間の空白時間帯にディスク使用率が
     #     85%に達した（proposed-node、2026-07-17）。2b(ESインデックス
     #     向けの同種の安全弁)と同じ考え方をresults/にも適用する。
-    #     doc/known-limitations.md参照。
     # ------------------------------------------------------------
     if [[ -n "${DISK_ROTATE_THRESHOLD:-}" ]]; then
         RESULTS_MIN_RETAIN_DAYS="${RESULTS_MIN_RETAIN_DAYS:-1}"
@@ -233,7 +232,7 @@ while IFS= read -r idx; do
 
         log "[EXTRACT] $idx を1分集計CSV に変換中..."
 
-        # 特徴量抽出 → gzip 圧縮（失敗・空出力・ヘッダのみは失敗扱い、#RR）
+        # 特徴量抽出 → gzip 圧縮（失敗・空出力・ヘッダのみは失敗扱い）
         if extract_index_to_gz "$idx" "$local_gz"; then
 
             gz_size=$(du -sh "$local_gz" | awk '{print $1}')
@@ -272,7 +271,7 @@ log "[ES] ローテート完了: 削除=${DELETED}件 失敗=${FAILED}件"
 #     MIN_RETAIN_DAYSまでは追加でローテートする
 #     （DISK_ROTATE_THRESHOLD未設定時は従来通り何もしない=既存ノードの挙動を変えない）。
 #     日数固定のローテートだけでは、ホスト全体の他要因（honeypotデータ増加等）
-#     による急なディスク圧迫に追いつけなかった事故（doc/known-limitations.md #J）を
+#     による急なディスク圧迫に追いつけなかった事故を
 #     受けて追加した安全弁。抽出→S3-compatible object storageアップロード確認後→ES削除という
 #     既存の安全な手順は変えず、対象範囲を動的に広げるだけ。
 # ----------------------------------------------------------------
@@ -322,8 +321,8 @@ fi
 #     テストトラフィックの着地先。実際のSuricata検知データではなく、
 #     各trialに必要な統計は実行時に loss_rate.json 等へ既に抽出済みのため
 #     ES側に生データを保持する価値がない。放置すると無制限に肥大化する
-#     （2026-07-13、単一インデックスが98GBまで増加した事故を受けて追加。
-#     doc/known-limitations.md 参照）。抽出せず毎回無条件に削除する。
+#     （2026-07-13、単一インデックスが98GBまで増加した事故を受けて追加）。
+# 抽出せず毎回無条件に削除する。
 # ----------------------------------------------------------------
 while IFS= read -r te_idx; do
     [[ -z "$te_idx" || "$te_idx" != threat-events-* ]] && continue
@@ -341,7 +340,7 @@ done < <(curl -s --connect-timeout 5 --max-time 30 "${ES_URL}/_cat/indices/threa
 #     compose独立スタックの方のESで、2cのロジックは一度もこちらに
 #     到達していなかった（2026-07-16、単一インデックスが103.2GBまで
 #     無自覚に肥大化しディスク99%に達した事故を受けて追加。
-#     doc/known-limitations.md 参照）。理由は2cと同一（loss_rate.json
+# 参照）。理由は2cと同一（loss_rate.json
 #     抽出済みで生データ保持不要）。BASELINE_REF_ES_URL未設定時は
 #     従来通り何もしない（=proposed-node・このcompose未起動のノードの
 #     挙動を変えない）。

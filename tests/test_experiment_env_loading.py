@@ -2,12 +2,12 @@
 # └── tests/
 #     └── test_experiment_env_loading.py
 #
-# doc/known-limitations.md #CCC: backup_clickhouse.sh・rotate_and_backup.sh だけが
+# backup_clickhouse.sh・rotate_and_backup.sh だけが
 # experiment.env を素の`source`で読んでおり、共通の load_experiment_env（`set -a`で
 # 自動export＋OBS_VENV対応）を使っていなかった。素の`source`では、experiment.envが
 # `export`なしで書かれていた場合に CLICKHOUSE_USER/PASSWORD が子プロセス
 # （record_backup_result.py）へ伝わらず、backup_logへの記録が認証失敗でサイレントに
-# 全滅する（#GG・#II、baseline-node側の更新漏れで実際に数日間発生）。
+# 全滅する（baseline-node側の更新漏れで実際に数日間発生）。
 #
 # (1) load_experiment_env が`export`なしの変数も子プロセスへ渡すこと
 # (2) 上記2スクリプトが素の`source`ではなくこの関数を使うこと
@@ -61,6 +61,6 @@ def test_backup_scripts_use_load_experiment_env_not_a_plain_source():
         )
         assert "load_experiment_env" in code, f"{name}: load_experiment_env を呼んでいません"
         assert not plain_source.search(code), (
-            f"{name}: experiment.env を素の`source`で読んでいます（#CCC）。"
+            f"{name}: experiment.env を素の`source`で読んでいます。"
             "load_experiment_env を使ってください。"
         )

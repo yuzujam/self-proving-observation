@@ -23,7 +23,7 @@ class TestFetchKnownNodeIds:
         assert fetch_known_node_ids("http://localhost:8123") == ("10.0.0.1", "10.0.0.2")
 
     def test_query_sent_to_clickhouse_has_exactly_one_format_clause(self, monkeypatch):
-        """#UU: query_json()が末尾にFORMAT JSONを付与するため、呼び出し側が付けると
+        """query_jsonが末尾にFORMAT JSONを付与するため、呼び出し側が付けると
         "FORMAT JSON FORMAT JSON"になりClickHouseが構文エラーを返す。従来のテストは
         query_json自体をモックしており、この二重付与を検出できなかった。"""
         captured = {}
@@ -103,7 +103,7 @@ class TestFetchCleanDailyCounts:
         assert params["known_sensors"] == list(KNOWN_CONTAMINATED_SENSOR_IDS)
 
     def test_where_clause_excludes_both_empty_and_unknown_sensor_ids(self, monkeypatch):
-        """#UU: vector.toml修正（2026-08-13）後、src_ip未解決は空文字ではなく"unknown"で
+        """vector.toml修正（2026-08-13）後、src_ip未解決は空文字ではなく"unknown"で
         記録される。threat_events_clean VIEW（proposed/init.sql）と同じく両方を除外する。"""
         captured = {}
 
@@ -121,7 +121,7 @@ class TestFetchCleanDailyCounts:
         assert captured["params"]["unresolved_sensors"] == ["", "unknown"]
 
     def test_contaminated_sensor_ids_override_replaces_default(self, monkeypatch):
-        """doc/pipeline-spec.md Phase 7: known_nodes由来のID一覧を渡せる（非破壊的拡張）。"""
+        """known_nodes由来のID一覧を渡せる（非破壊的拡張）。"""
         captured = {}
 
         def fake_query_json(url, sql, params, timeout=10):

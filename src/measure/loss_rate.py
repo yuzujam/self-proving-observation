@@ -29,7 +29,7 @@ ensure_utf8_stdio()
 # ES検証クエリの429（Too Many Requests）に対するリトライ回数・初期待機秒数。
 # 429は一過性のレート制限であり恒久的な障害ではないため、即座に
 # verification_failed扱いにせず指数バックオフで再試行する
-# （known-limitations.md #X、対照実験のbaseline検証失敗率が高い問題への対応）。
+# （対照実験のbaseline検証失敗率が高い問題への対応）。
 ES_RETRY_MAX_ATTEMPTS = 4
 ES_RETRY_BASE_DELAY_SECONDS = 2.0
 
@@ -64,7 +64,7 @@ def _utc_naive(iso: str) -> datetime:
     """ISO8601文字列をUTCのタイムゾーン情報なしdatetimeへ変換する（ClickHouseセッションTZはUTC）。
 
     オフセット付きの値はオフセットを捨てるのではなくUTCへ変換する。オフセットなしは
-    UTCとみなす（doc/known-limitations.md #VV、worker.pyの`_fmt_ts`と同じ扱い）。
+    UTCとみなす（worker.pyの`_fmt_ts`と同じ扱い）。
     """
     dt = datetime.fromisoformat(iso)
     if dt.tzinfo is not None:
@@ -106,7 +106,7 @@ def query_clickhouse_ids(
         where_clauses.append("timestamp <= {ts_to:DateTime64(3)}")
 
     # 合成注入トラフィックはworker.pyによりthreat_events_experiment（短いTTL）へ
-    # 振り分けられる（doc/known-limitations.md #L）。本体のthreat_eventsは
+    # 振り分けられる。本体のthreat_eventsは
     # 90日観測データ専用のため、対照実験の突合はこちらを参照する。
     where = " AND ".join(where_clauses)
     sql = (

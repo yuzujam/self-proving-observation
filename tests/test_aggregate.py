@@ -180,7 +180,7 @@ class TestParseMemMib:
 
 
 class TestAggregateResourceTotals:
-    """doc/known-limitations.md #GGG: 6.5節の表（時刻ごとの全コンテナ合計%の
+    """6.5節の表（時刻ごとの全コンテナ合計%の
     平均・中央値・p95）を算出した手順がリポジトリに存在しなかった。"""
 
     @staticmethod
@@ -237,7 +237,7 @@ class TestAggregateResourceTotals:
         assert result["cpu_percent_total"]["mean"] == 20.0
 
     def test_no_matching_containers_returns_none_stats(self, tmp_path):
-        """対象コンテナが1つもない場合、混入値で埋めずNoneを返す（内部指針 5.4）。"""
+        """対象コンテナが1つもない場合、混入値で埋めずNoneを返す。"""
         p = str(tmp_path / "resource_baseline.csv")
         self._write_resource_csv(p, [("t1", "cowrie", 900.0, "50MiB / 1GiB")])
         result = aggregate_resource_totals([p], container_prefix="baseline-")
@@ -247,11 +247,11 @@ class TestAggregateResourceTotals:
 
 
 class TestScanBatchDirResourceFiltering:
-    """doc/known-limitations.md #AA: monitor/resource.pyのSSH経由取得は同居する無関係な
+    """monitor/resource.pyのSSH経由取得は同居する無関係な
     コンテナ（baseline-nodeの本番T-Potハニーポット群、逆側スタック等）も記録する。
     parse_resource_csvにcontainer_prefix引数が追加されただけで、scan_batch_dirが
     それを渡しておらず、stats.py・batch_report.py・pool_control_experiment_stats.py
-    のCPU/メモリピークが混入した値のままだった（#TT）。"""
+    のCPU/メモリピークが混入した値のままだった。"""
 
     @staticmethod
     def _write_resource_csv(path, rows):
@@ -293,7 +293,7 @@ class TestScanBatchDirResourceFiltering:
 
     def test_stack_with_no_matching_containers_yields_no_resource_stats(self, tmp_path):
         # 他スタックのコンテナしか記録されていない場合、混入値で埋めずに空とする
-        # （欠測を「別コンテナの値」で代替しない、内部指針 5.4）。
+        # （欠測を「別コンテナの値」で代替しない）。
         run_dir = tmp_path / "flat_rps100_trial1"
         run_dir.mkdir()
         self._write_resource_csv(run_dir / "resource_baseline.csv", [

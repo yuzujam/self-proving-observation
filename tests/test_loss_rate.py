@@ -240,7 +240,7 @@ class TestQueryElasticsearchIdsRetry:
 
 
 class TestQueryClickhouseIdsTimeRange:
-    """#VV: 時間範囲のオフセット付き値はUTCへ変換する（捨てて時刻をずらさない）。"""
+    """時間範囲のオフセット付き値はUTCへ変換する（捨てて時刻をずらさない）。"""
 
     @staticmethod
     def _captured_params(monkeypatch, ts_from, ts_to):

@@ -118,7 +118,7 @@ DRIFT_SCENARIOS = {
 def inject_no_drift(data: np.ndarray, drift_start: int, rng: np.random.Generator) -> np.ndarray:
     """ドリフトを注入しない対照（null）条件。検知器が正常データに誤警報を出す割合の測定用。
 
-    doc/known-limitations.md #FFF: 既存の3シナリオは全てドリフトを含み、確認検知率は
+    既存の3シナリオは全てドリフトを含み、確認検知率は
     「ドリフトがあるときに検知する割合（感度）」に限られていた。ベースライン確立後も
     ドリフトの無い窓を続けたデータに同じ検知器・同じ判定を適用して、誤警報を数える。
     """
@@ -475,8 +475,8 @@ def main():
     parser.add_argument(
         "--scenario",
         choices=list(DRIFT_SCENARIOS.keys()) + [NULL_SCENARIO_NAME, "all"], default="all",
-        help="実行するドリフトシナリオ。none はドリフトを注入しない対照条件（誤警報の測定、"
-             "#FFF）で、--scenario all には含まれない。確定結果のディレクトリ（results/fidelity）"
+        help="実行するドリフトシナリオ。none はドリフトを注入しない対照条件（誤警報の測定）"
+             "で、--scenario all には含まれない。確定結果のディレクトリ（results/fidelity）"
              "とは別の --output-dir を指定すること",
     )
     parser.add_argument(

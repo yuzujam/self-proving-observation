@@ -23,7 +23,7 @@ REDIS_URL = os.environ.get("REDIS_URL", "redis://redis:6379")
 CLICKHOUSE_URL = os.environ.get("CLICKHOUSE_URL", "http://clickhouse:8123")
 REDIS_QUEUE_KEY = "obs:event_queue"
 REDIS_HEARTBEAT_QUEUE_KEY = "obs:heartbeat_queue"
-# INSERT行を組み立てられない不正イベントの隔離先（元のペイロードのまま保持、doc/pipeline-spec.md）
+# INSERT行を組み立てられない不正イベントの隔離先（元のペイロードのまま保持）
 REDIS_DEAD_LETTER_KEY = "obs:event_dead_letter"
 
 BATCH_SIZE = int(os.environ.get("WORKER_BATCH_SIZE", "500"))
@@ -83,7 +83,7 @@ def insert_to_clickhouse(events: list[RawPayload]) -> int:
     inject_id が設定されている行（対照実験の合成注入トラフィック）は
     threat_events_experiment（短いTTLで自動失効）へ、それ以外は本体の
     threat_events へ振り分ける。90日観測データに実験ノイズを混入させない
-    ための分離（doc/known-limitations.md #L）。
+    ための分離。
     """
     inserted, _failed, _invalid = _insert_to_clickhouse_detailed(events)
     return inserted
@@ -94,7 +94,7 @@ def _fmt_ts(raw: str) -> str:
 
     UTCオフセット付き（例: `+0200`）の値は、オフセットを捨てず**UTCへ変換**してから
     タイムゾーン情報を外す。以前はオフセットを変換せずに捨てていたため、UTC以外の
-    センサーの時刻が（例: +0200なら2時間）ずれて記録された（doc/known-limitations.md #VV）。
+    センサーの時刻が（例: +0200なら2時間）ずれて記録された。
     オフセットなしの値はUTCとみなす（従来どおり）。
     """
     try:
@@ -103,7 +103,7 @@ def _fmt_ts(raw: str) -> str:
             dt = dt.astimezone(UTC)
         return dt.replace(tzinfo=None).strftime("%Y-%m-%d %H:%M:%S.%f")[:23]
     except (ValueError, AttributeError):
-        # 内部指針 3.3/5.4によりタイムスタンプの現在時刻代替は禁止だが、
+        # タイムスタンプを現在時刻で代替することは禁止だが、
         # 不正な値を挿入も破棄もできないため代替はやむを得ない。
         # 「代替が起きた」事実だけは必ずログに残す（無音代替の禁止）。
         logger.error(f"[ERROR] Invalid event timestamp {raw!r}, substituting now(UTC)")
@@ -138,8 +138,8 @@ def _insert_to_clickhouse_detailed(
     のみを呼び出し元へ返すことで、この二重挿入を防ぐ。
 
     不正event（severity・countが整数化できない等）は、例外にせず第3要素として
-    返す。以前は例外がワーカーを落とし、RPOP済みのバッチ全体が消えていた
-    （doc/known-limitations.md #VV）。呼び出し元が隔離リストへ移す。
+    返す。以前は例外がワーカーを落とし、RPOP済みのバッチ全体が消えていた。
+    呼び出し元が隔離リストへ移す。
     """
     if not events:
         return 0, [], []
@@ -194,10 +194,10 @@ def _quarantine_events(r: redis.Redis, events: list[RawPayload]) -> None:
 def _heartbeat_row(hb: RawPayload) -> HeartbeatRow:
     """heartbeatペイロードからINSERT用の行を組み立てる。
 
-    `_received_at`（receiver/app.pyがFastAPI受信時刻を付与、doc/known-limitations.md CC）
+    `_received_at`（receiver/app.pyがFastAPI受信時刻を付与）
     があれば明示的な`timestamp`を設定する。ワーカー障害で滞留したheartbeatが復旧時に
     一括INSERTされても、テーブル側の`DEFAULT now()`（=挿入時刻）ではなく実際の受信時刻を
-    保持するため（内部指針 3.3「イベント発生時刻を必ず保持する。挿入時刻で代替しない」）。
+    保持するため（イベント発生時刻を必ず保持し、挿入時刻で代替しない）。
     未設定・不正な値の場合は`timestamp`キー自体を省略し、既存動作どおり`DEFAULT now()`に委ねる。
     """
     row: HeartbeatRow = {
@@ -344,8 +344,8 @@ def run() -> None:
     remaining_heartbeats = drain_heartbeat_queue(r)
     if remaining_heartbeats and insert_heartbeats_to_clickhouse(remaining_heartbeats) == 0:
         # 挿入に失敗したまま戻り値を無視すると、RPOP済みのheartbeatが黙って消え、
-        # 実際には生存していた期間が偽の欠損として現れる（内部指針 3.3「静かに捨てない」、
-        # doc/known-limitations.md #VV）。メインループと同様に再キューして次回起動へ残す。
+        # 実際には生存していた期間が偽の欠損として現れる（静かに捨てない）。
+        # メインループと同様に再キューして次回起動へ残す。
         pipe = r.pipeline()
         for hb in reversed(remaining_heartbeats):
             pipe.rpush(REDIS_HEARTBEAT_QUEUE_KEY, json.dumps(hb))

@@ -3,8 +3,8 @@
 #     └── analyze_ablation_batch.py
 #
 # scripts/run_ablation_batch.sh が生成する results/ablation_batch_* ディレクトリ
-# （複数のWINDOW_MS×複数試行を積み上げたもの）を集計し、doc/pipeline-spec.md
-# 「補強実験: 集約ウィンドウのアブレーション実験」の目的1〜3（正確性・レイテンシ・
+# （複数のWINDOW_MS×複数試行を積み上げたもの）を集計し、
+# 集約ウィンドウのアブレーション実験の目的1〜3（正確性・レイテンシ・
 # オーバーヘッド）をウィンドウ長ごとに要約する。analyze_multiedge_results.py・
 # pool_control_experiment_stats.pyと同種の、対話セッション向けの一時的な再解析
 # スクリプトという位置づけ（結果ディレクトリの恒久的な分析基盤ではない）。

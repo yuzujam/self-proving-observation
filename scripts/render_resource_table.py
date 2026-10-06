@@ -2,9 +2,9 @@
 # └── scripts/
 #     └── render_resource_table.py
 #
-# doc/paper-draft.md 6.5節（リソース消費）の表を、resource_baseline.csv・
+# 論文6.5節（リソース消費）の表を、resource_baseline.csv・
 # resource_proposed.csv（monitor/resource.pyが対照実験の各trialごとに生成する
-# docker統計CSV）から再現するためのスクリプト（doc/known-limitations.md #GGG）。
+# docker統計CSV）から再現するためのスクリプト。
 # 6.5節の指標は「時刻ごとに対象スタックの全コンテナの値を合計してから、その合計値の
 # 系列全体に対して平均・中央値・p95を取る」もので、既存のparse_resource_csv()の
 # 行単位peak/meanとは異なるため、src/measure/aggregate.pyのaggregate_resource_totals()

@@ -23,7 +23,7 @@ PROPOSED_URL="${PROPOSED_URL:-http://localhost:8000/events}"
 CLICKHOUSE_URL="${CLICKHOUSE_URL:-http://localhost:8123}"
 ELASTICSEARCH_URL="${ELASTICSEARCH_URL:-http://localhost:9200}"
 # CLICKHOUSE_USER未設定時は空配列（認証ヘッダーなし）になり、無認証
-# ClickHouseに対する既存の挙動を変えない（内部指針 3.4、非破壊的拡張）。
+# ClickHouseに対する既存の挙動を変えない（非破壊的拡張）。
 CH_AUTH_ARGS=()
 if [[ -n "${CLICKHOUSE_USER:-}" ]]; then
     CH_AUTH_ARGS=(-H "X-ClickHouse-User: ${CLICKHOUSE_USER}" -H "X-ClickHouse-Key: ${CLICKHOUSE_PASSWORD:-}")

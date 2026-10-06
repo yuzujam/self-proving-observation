@@ -2,7 +2,6 @@
 # └── proposed/
 #     └── docker-compose.ablation.yml  — 集約ウィンドウのアブレーション実験専用の隔離スタック
 #
-# doc/pipeline-spec.md「補強実験: 集約ウィンドウのアブレーション実験」の実装。
 # Vectorコンテナ1つのみで構成し、proposed/docker-compose.yml（本番の90日間観測パイプライン、
 # redis/clickhouse/receiver/worker/vector）とはネットワーク・ボリューム・コンテナ名のいずれも
 # 非接続。本番スタックが稼働中でも並行して起動・停止して構わない設計。
@@ -11,15 +10,15 @@
 #   ABLATION_DATA_DIR=/path/to/scratch/dir （事前に vector-ablation.generated.toml を
 #   同ディレクトリへ配置しておくこと。proposed/vector-ablation.toml をテンプレートとして
 #   sed置換したもの。Vector自身の実行時env var展開は非文字列コンテキストで機能しない
-#   ため使わない、doc/known-limitations.md参照）
+#   ため使わない）
 #   docker compose -f proposed/docker-compose.ablation.yml up -d
 #   docker compose -f proposed/docker-compose.ablation.yml down
 #
 # name: docker composeは未指定時、compose fileのディレクトリ名（この場合"proposed"）を
 # プロジェクト名として使う。本番docker-compose.ymlも同じproposed/ディレクトリに
 # あるため、name未指定だと両者が同じプロジェクト名を共有し、本番の5コンテナが
-# 「このプロジェクトのorphan container」として誤検知される（実機確認済みの実害、
-# doc/known-limitations.md参照）。name指定により`-p`フラグの有無に関わらず
+# 「このプロジェクトのorphan container」として誤検知される（実機確認済みの実害）。
+# name指定により`-p`フラグの有無に関わらず
 # 常に本番と別プロジェクトとして扱われる。
 
 name: obs-ablation

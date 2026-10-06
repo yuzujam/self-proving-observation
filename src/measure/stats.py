@@ -73,8 +73,7 @@ def fisher_exact_loss_occurrence(
     仮説の実体（proposedは構造的に欠損しない）に対応する二項検定として追加する。
     proposedのloss_rateが多くの試行で0.00%に張り付き分散がほぼゼロになる場合、
     連続値の順位検定では効果量が薄まりやすいため、「欠損が起きたか否か」という
-    二値の発生率に着目することで同じデータからより高い検出力を得られる場合がある
-    （doc/known-limitations.md #X参照）。
+    二値の発生率に着目することで同じデータからより高い検出力を得られる場合がある。
     """
     n_baseline, n_proposed = len(baseline), len(proposed)
     if n_baseline == 0 or n_proposed == 0:
@@ -114,7 +113,7 @@ def cochran_armitage_trend_test(
 
     mann_whitney_test・fisher_exact_loss_occurrenceはRPS条件ごとの独立した
     2群比較であり、20条件への多重比較補正後は`ramp/wave×rps=5000`の2条件
-    のみ有意という局所的な結果になる（doc/paper-data-snapshot.md）。本関数は
+    のみ有意という局所的な結果になる。本関数は
     それらを置き換えるものではなく、「RPSが上がるほど欠損発生率が単調に
     増加するか」という用量反応関係をパターン単位（RPS軸横断）で追加検証する
     ために新設する。
@@ -294,7 +293,7 @@ def analyze_condition(
 
     loss_rate_percentは、検証クエリ自体の失敗（例: ES 429、`verification_failed`）
     による値を真の欠損と区別し統計検定から除外する（`src/measure/aggregate.py`の
-    集計と同じ扱い。内部指針 3.3「欠損の記録が最優先」）。除外件数は
+    集計と同じ扱い。欠損の記録を最優先する）。除外件数は
     `analyze_batch_results`側で`n_verification_failed`として別途開示する。
     """
     values = []
@@ -500,7 +499,7 @@ def export_latex_confirming_detection_table(
     """Fidelity Guard 実験結果（確認指標としての検知性能）を LaTeX 表として出力する。
 
     shap_drift_score は精度低下の先行指標ではなく確認指標であることが実験で
-    確定した（doc/decisions.md）ため、confirming_detected / detection_lag を
+    確定したため、confirming_detected / detection_lag を
     用いる。旧指標 fidelity_leads ベースの表は export_latex_fidelity_table に
     後方互換のため残し、本関数はそれを置き換えるものではなく追加の出力先とする。
     """
@@ -535,7 +534,7 @@ def export_latex_confirming_detection_table(
         r"shap\_drift\_scoreがMAX\_CONFIRMING\_LAG（8ウィンドウ）以内に検知した試行数",
         r"95\% CI: Wilson score interval",
         r"旧指標 fidelity\_leads（厳密な先行判定）は構造的にほぼ常に0\%になるため"
-        r"本表には含めない（doc/decisions.md参照。生データには後方互換のため保持）",
+        r"本表には含めない（生データには後方互換のため保持）",
     ]))
 
     with open(output_path, "w", encoding="utf-8") as f:

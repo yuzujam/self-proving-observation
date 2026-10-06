@@ -43,7 +43,7 @@ def parse_resource_csv(csv_path: str, container_prefix: str = "") -> dict[str, A
     稼働中の全コンテナを無差別に記録するため（対象compose projectで
     フィルタしない）、resource_baseline.csv／resource_proposed.csvには
     同居する無関係なコンテナ（本番T-Potハニーポット群・逆側のスタック等）
-    が混入しうる（doc/known-limitations.md参照）。`container_prefix`を
+    が混入しうる。`container_prefix`を
     指定すると、`container`列がその接頭辞で始まる行のみに絞り込む。
     未指定時（既定値""）は従来通り全行を対象とし後方互換を保つ。
     """
@@ -95,11 +95,11 @@ def aggregate_resource_totals(
 ) -> dict[str, Any]:
     """複数のリソースCSVから「時刻ごとの全対象コンテナ合計」の系列をプールし統計を出す。
 
-    `doc/paper-draft.md` 6.5節の表が示す指標（時刻ごとに対象スタックの全コンテナの
+    論文6.5節の表が示す指標（時刻ごとに対象スタックの全コンテナの
     値を合計してから、その合計値の系列全体に対して平均・中央値・p95を取る）を
     再現する。`parse_resource_csv()`が返す行単位のpeak/mean（コンテナも時刻も
     区別せず1本の系列として扱う）とは異なる指標のため、独立した関数として実装する
-    （`doc/known-limitations.md` #GGG: 従来この指標を算出した手順がリポジトリに
+    （従来この指標を算出した手順がリポジトリに
     存在せず対話セッションでの個別集計に依存していた）。
 
     `csv_paths`は複数の`resource_baseline.csv`/`resource_proposed.csv`（複数バッチ・
@@ -169,8 +169,7 @@ def scan_batch_dir(batch_dir: str) -> list[dict[str, Any]]:
             if os.path.exists(csv_path):
                 # 対象スタックのコンテナ（compose project名 baseline / proposed が
                 # コンテナ名の接頭辞）のみに絞る。SSH経由のdocker statsは同居する
-                # 本番T-Pot群や逆側スタックも記録するため（doc/known-limitations.md
-                # #AA・#TT）。
+                # 本番T-Pot群や逆側スタックも記録するため。
                 resources[system] = parse_resource_csv(
                     csv_path, container_prefix=f"{system}-",
                 )

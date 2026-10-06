@@ -2,7 +2,7 @@
 # └── tests/
 #     └── test_cleanup_synthetic_events.py
 #
-# doc/known-limitations.md #SS: cleanup_synthetic_events.py のバックアップ用
+# cleanup_synthetic_events.py のバックアップ用
 # エクスポートは `curl -s`（認証ヘッダーなし・`-f`なし）をrcloneへパイプしていた。
 # 2026-08-19のClickHouse認証導入後は401のエラー本文が「Parquet」として
 # アップロードされ、curl・rcloneとも終了コード0のまま `--confirm` のDELETEに

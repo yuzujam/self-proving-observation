@@ -6,9 +6,9 @@
 # loss_rate.py がClickHouse/Elasticsearchを突合して結果をresults/*/loss_rate.jsonに
 # 書き出した時点で役目を終える。生の行をClickHouseに残し続ける必要はなく、
 # 2026-07-13には942,249,269行・約31.8GBがバックログとして残存し、
-# ディスクを圧迫していたことが判明した（doc/known-limitations.md #K関連）。
+# ディスクを圧迫していたことが判明した。
 #
-# 内部指針 5.1（ClickHouseへのDELETE FROMは手動確認後にのみ実行）に従い、
+# ClickHouseへのDELETE FROMは手動確認後にのみ実行する方針に従い、
 # cronからは呼び出さない。MAX_RUNSを増やして対照実験を追加した場合など、
 # 必要になったタイミングで手動実行する運用ツール。
 #
@@ -46,8 +46,7 @@ def export_parquet(url: str, query: str, sink_cmd: list[str], *, timeout: int = 
 
     以前は`curl -s`（認証ヘッダーなし・`-f`なし）をパイプしていたため、
     2026-08-19のClickHouse認証導入後は401のエラー本文が「Parquet」として
-    アップロードされ、curl・rcloneとも終了コード0のまま後続のDELETEに進みえた
-    （doc/known-limitations.md #SS）。ここでは
+    アップロードされ、curl・rcloneとも終了コード0のまま後続のDELETEに進みえた。ここでは
       1. `clickhouse_open`（認証ヘッダー付与・非2xxは例外）で取得する
       2. 先頭・末尾が`PAR1`（Parquetのマジック）であることを確認する
          （エラー本文や途中で切れたストリームを弾く）
@@ -120,7 +119,7 @@ def main() -> None:
         "エラー（InvalidPart/NoSuchUpload）に遭遇しやすくなるため、"
         "デフォルトのrclone既定値（5M）より大きくしてパート数自体を減らす"
         "（2026-07-13、942,849,269行のエクスポートで実際に5Mでは"
-        "2回連続失敗したため確認済み。doc/known-limitations.md参照）"
+        "2回連続失敗したため確認済み）。"
     )
     args = parser.parse_args()
 

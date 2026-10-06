@@ -46,7 +46,7 @@ def main() -> None:
 def _record(args: argparse.Namespace) -> bool:
     """backup_log への INSERT を試みる。成否を bool で返す。
 
-    doc/known-limitations.md #FF: 従来はここで例外を握りつぶした後
+    従来はここで例外を握りつぶした後
     main() が正常終了扱い（exit 0）で戻っていたため、backup_log 自体への
     記録失敗（＝自己証明型完全性保証の台帳そのものの欠落）を呼び出し元
     （backup_clickhouse.sh / rotate_and_backup.sh）が検知する手段が

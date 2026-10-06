@@ -4,7 +4,7 @@
 #     └── send_heartbeat.sh — 1分ごとに中央レシーバーへ生存証明を送信する
 #
 # 通信断・クラッシュによる観測欠損期間を自己証明するための
-# Heartbeat レイヤー（内部指針 1.2.2）。失敗しても何もしない
+# Heartbeat レイヤー。失敗しても何もしない
 # （= その分だけ heartbeats テーブルに記録が欠け、欠損として可視化される）。
 #
 # Cron（proposed-node / baseline-node 共通）: * * * * * /path/to/scripts/send_heartbeat.sh

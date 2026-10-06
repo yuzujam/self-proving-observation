@@ -14,7 +14,7 @@ from src.logging_config import get_logger
 
 logger = get_logger(__name__)
 
-# 注意（doc/known-limitations.md #AAA）: このモジュールのClickHouse抽出（extract_windowed_features /
+# 注意: このモジュールのClickHouse抽出（extract_windowed_features /
 # prepare_dataset）は現状どこからも呼ばれていない。確定済みのFidelity Guard実験
 # （scripts/run_fidelity_experiment.py）は合成データで動作する。実データへ適用する場合は、
 #   - 集計対象が生の threat_events（対照実験の混入・自ノードIP・sensor_id 空/unknown を含む）で
@@ -40,8 +40,8 @@ def _count_missing_windows(rows: list[dict[str, Any]], window_minutes: int = WIN
     """連続する window_start の間に欠けている（イベントが1件も無い）窓の総数を返す。
 
     GROUP BY は空の窓を出力しないため、観測の空白（イベント無し、または観測欠損）が
-    黙って詰められ、時間的に離れた窓がシーケンス上で隣接する。欠損を隠さない
-    （内部指針 5.4）ため件数を数えて警告する。値の補間・0埋めはしない。
+    黙って詰められ、時間的に離れた窓がシーケンス上で隣接する。欠損を隠さないため、
+    件数を数えて警告する。値の補間・0埋めはしない。
     """
     starts = [datetime.fromisoformat(str(r["window_start"])) for r in rows if r.get("window_start")]
     missing = 0

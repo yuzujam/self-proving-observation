@@ -46,7 +46,7 @@ def train_model(
     """LSTM モデルを学習する。"""
     # torch.manual_seed だけでは CPU 上のマルチスレッド演算（reduction順序）
     # まで決定論的にならず、同一シードでも実行のたびに浮動小数点レベルで
-    # 結果が揺れうる（doc/known-limitations.md #2: gradual/recurring trial8の
+    # 結果が揺れうる（gradual/recurring trial8の
     # detection_lag符号が同一seedにもかかわらず07-06版と07-12版で入れ替わった件の
     # 原因候補）。use_deterministic_algorithms で決定論的な実装を強制する
     # （非対応opは例外を投げずwarn_onlyで警告に留める）。

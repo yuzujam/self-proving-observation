@@ -2,7 +2,7 @@
 # └── tests/
 #     └── test_fidelity_null_condition.py
 #
-# doc/known-limitations.md #FFF: Fidelity Guardの確認検知率は感度のみで、ドリフトの無い正常な
+# Fidelity Guardの確認検知率は感度のみで、ドリフトの無い正常な
 # 窓に対する誤警報が測られていなかった。scripts/run_fidelity_experiment.py に追加した
 # null（ドリフト無し）条件の集計と、既存のシナリオ・出力が変わっていないことを検査する。
 # LSTM・SHAPの学習を伴う run_single_scenario 自体は重いため対象にしない（実機で実行して確認）。

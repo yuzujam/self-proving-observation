@@ -20,13 +20,13 @@ PROJECT_DIR="$(dirname "$SCRIPT_DIR")"
 source "$SCRIPT_DIR/lib/common.sh"
 # 素の`source`ではexperiment.envが`export`なしで書かれていた場合に子プロセス
 # （record_backup_result.py の CLICKHOUSE_USER/PASSWORD）へ伝わらず、backup_logへの
-# 記録が認証失敗でサイレントに全滅する（#GG・#II）。他のスクリプトと同じく、
-# 自動exportする共通の読み込み関数を使う（doc/known-limitations.md #CCC）。
+# 記録が認証失敗でサイレントに全滅する。他のスクリプトと同じく、
+# 自動exportする共通の読み込み関数を使う。
 load_experiment_env
 
 CLICKHOUSE_URL="${CLICKHOUSE_URL:-http://localhost:8123}"
 # CLICKHOUSE_USER未設定時は空配列（認証ヘッダーなし）になり、無認証
-# ClickHouseに対する既存の挙動を変えない（内部指針 3.4、非破壊的拡張）。
+# ClickHouseに対する既存の挙動を変えない（非破壊的拡張）。
 CH_AUTH_ARGS=()
 if [[ -n "${CLICKHOUSE_USER:-}" ]]; then
     CH_AUTH_ARGS=(-H "X-ClickHouse-User: ${CLICKHOUSE_USER}" -H "X-ClickHouse-Key: ${CLICKHOUSE_PASSWORD:-}")
@@ -50,7 +50,7 @@ FAILURES=()
 
 # backup_log テーブルへ成否を記録（ClickHouse パラメタライズドクエリ）
 #
-# doc/known-limitations.md #FF: record_backup_result.py のINSERT自体が
+# record_backup_result.py のINSERT自体が
 # 失敗しても、従来はexit codeを一切確認していなかったため、backup_log
 # ——自己証明型完全性保証の台帳そのもの——への記録漏れがFAILURES/通知
 # に一切反映されなかった。ここで終了コードを確認し失敗を積む。
@@ -60,7 +60,7 @@ record_result() {
         --table "$table" --status "$status" --rows "$rows" --error "$err" \
         --backup-date "$bdate" --node-id "$NODE_ID" \
         --clickhouse-url "$CLICKHOUSE_URL"; then
-        FAILURES+=("${table}: backup_logへの記録に失敗（status=${status}を記録できず、doc/known-limitations.md #FF）")
+        FAILURES+=("${table}: backup_logへの記録に失敗（status=${status}を記録できず）")
     fi
 }
 
@@ -71,7 +71,7 @@ backup_table() {
     local out="${BACKUP_TMP}/${table}_${bdate}.parquet"
     # 同じ表・日付で前回upload_failed等により残った古いParquet。今回のエクスポートが成功
     # したら、後段のリトライ処理がこの古い（後着行を含まない可能性のある）ファイルを
-    # 新しいものの上に再アップロードしてしまわないよう消す（doc/known-limitations.md #ZZ）。
+    # 新しいものの上に再アップロードしてしまわないよう消す。
     local stale
     stale="$(dirname "$BACKUP_TMP")/obs-ch-backup-${bdate}/${table}_${bdate}.parquet"
 
@@ -155,7 +155,7 @@ backup_table() {
 #   - まだ threat_events_local_prune として削除済み記録がない
 #   - 7日以上前（後から問題が見つかっても対応できる猶予を残す）
 #   - ローカルの現在件数が、バックアップ時に記録した件数（backup_log.row_count）を
-#     超えていない（2026-09-24追加、doc/known-limitations.md #ZZ）。日次バックアップは
+#     超えていない（2026-09-24追加）。日次バックアップは
 #     UTC日が終わった直後に走るため、日末の数秒分の行がバックアップ後に挿入されうる。
 #     rclone checkは「アップロードしたファイルの完全性」しか保証せず、この後着行が
 #     バックアップに含まれることまでは保証しない。超えている場合はその日を再エクスポート
@@ -226,9 +226,9 @@ prune_verified_threat_events() {
                 --table "threat_events_local_prune" --status "success" --rows "${rows_before}" \
                 --backup-date "${d}" --node-id "${NODE_ID}" --clickhouse-url "${CLICKHOUSE_URL}"; then
                 # 削除自体は完了済みだが監査ログへの記録に失敗した。この日付は
-                # 次回以降 rows_before=0 で continue するため自動再記録されない
-                # （doc/known-limitations.md #FF）、通知して手動追記を促す。
-                FAILURES+=("threat_events ${d}: ローカル削除は完了したがthreat_events_local_prune記録に失敗（doc/known-limitations.md #FF）")
+                # 次回以降 rows_before=0 で continue するため自動再記録されないため、
+                # 通知して手動追記を促す。
+                FAILURES+=("threat_events ${d}: ローカル削除は完了したがthreat_events_local_prune記録に失敗")
             fi
         else
             log "[PRUNE] threat_events ${d} の削除失敗"
@@ -242,7 +242,7 @@ prune_verified_threat_events() {
 # 以前は「export_failedは次回リトライ対象」とコメントされていたが、リトライ処理は
 # ローカルに残った未アップロードParquetにしか働かず、export_failedの日は再試行されな
 # かった。また残留Parquetのリトライ成功はbackup_logを更新しないため、その日は
-# upload_failedのまま永久にpruneされなかった（doc/known-limitations.md #ZZ）。
+# upload_failedのまま永久にpruneされなかった。
 # ClickHouseが応答しない場合はsuccess記録の有無を判定できないため、何もしない。
 # 手動で日付を指定した実行（バックフィル等）では走らせない。
 catch_up_failed_backups() {

@@ -36,7 +36,7 @@ load_experiment_env() {
     # cron実行時は対話シェルのvenv activateを経由しないため、python3が
     # システム標準（numpy/scipy/torch/shap/matplotlib未インストール）を
     # 指してしまい、run_full_thesis.shのプリフライトが常に失敗する不具合が
-    # あった（2026-07-07確認、doc/known-limitations.md #6）。
+    # あった（2026-07-07確認）。
     # experiment.envに以下を設定すると、cron経由でもvenvのpython3が優先される:
     #   export OBS_VENV=/home/<user>/obs-venv
     if [ -n "${OBS_VENV:-}" ] && [ -x "${OBS_VENV}/bin/python3" ]; then
@@ -47,8 +47,8 @@ load_experiment_env() {
 # ヘルスチェック URL に到達可能かどうかを終了ステータスで返す。
 # --connect-timeout/--max-time を明示しないと、応答が返らない相手先に対して
 # curlが無期限にハングし、cron経由の呼び出し元スクリプト全体を止めてしまう
-# （2026-07-07、対照実験が7日間完走しない件の調査で発見。内部指針 3.2の
-# 「DB接続にはtimeout指定」と同じ考え方をヘルスチェックにも適用する）。
+# （2026-07-07、対照実験が7日間完走しない件の調査で発見。「DB接続にはtimeout指定」と
+# 同じ考え方をヘルスチェックにも適用する）。
 # 第2引数以降は追加のcurlオプション（例: ClickHouse認証ヘッダー）として
 # そのままcurlへ渡す。既存の1引数呼び出しは無変更で動作する。
 health_ok() {

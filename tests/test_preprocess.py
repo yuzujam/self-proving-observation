@@ -62,7 +62,7 @@ class TestCreateSequences:
 
 
 class TestMissingWindowDetection:
-    """#AAA: GROUP BYは空の窓を出力しないため、観測の空白が黙って詰められる。
+    """GROUP BYは空の窓を出力しないため、観測の空白が黙って詰められる。
     値は補間せず、欠けた窓の件数を数えて警告できるようにする。"""
 
     def test_no_gap_is_zero(self):

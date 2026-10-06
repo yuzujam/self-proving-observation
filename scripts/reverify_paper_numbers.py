@@ -2,10 +2,10 @@
 # └── scripts/
 #     └── reverify_paper_numbers.py
 #
-# 論文（doc/paper-draft-en.md）の数値を、観測終了後にS3互換ストレージへ残った
+# 論文の数値を、観測終了後にS3互換ストレージへ残った
 # 元データ
 # （日次Parquet・results/の各CSV/JSON）から再計算するための対話セッション向け
-# スクリプト（2026-10-02の全数値の再検証で使った手順の整理。doc/decisions.md参照）。
+# スクリプト（2026-10-02の全数値の再検証で使った手順の整理。）。
 # analyze_periodicity_final.py（6.3）・pool_control_experiment_stats.py（6.1）・
 # render_resource_table.py（6.5の表）・analyze_ablation_batch.py（6.6）は別スクリプト。
 # 取得は読み取りのみ（rclone copy）。例:

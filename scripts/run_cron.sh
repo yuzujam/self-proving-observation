@@ -29,13 +29,13 @@ set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 PROJECT_ROOT="$(dirname "$SCRIPT_DIR")"
 
-# ── 起動記録（「行の不在」による検知用、doc/known-limitations.md #S・#PP） ──
+# ── 起動記録（「行の不在」による検知用） ──
 # ロック・実行回数チェックより前に書く: これらのチェックでスキップ・失敗する
 # ケースも含め「cronがこのスクリプトを起動したこと」自体を記録する。
 # 2026-07-07に発生した「run_cron.sh自体が起動した形跡がない」原因不明の
-# 空白（#S）は、起動有無を示す記録が一切存在しなかったため事後調査もできな
+# 空白は、起動有無を示す記録が一切存在しなかったため事後調査もできな
 # かった。UTCで記録するのはClickHouseセッションTZ（UTC）・分析スクリプトとの
-# 時刻基準統一のため（ホストのCESTとは別、内部指針 3.2参照）。
+# 時刻基準統一のため（ホストのCESTとは別）。
 mkdir -p "$PROJECT_ROOT/logs"
 date -u '+%Y-%m-%d %H:%M:%S' >> "$PROJECT_ROOT/logs/run_cron_invocations.log"
 

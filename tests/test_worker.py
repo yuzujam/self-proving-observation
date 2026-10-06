@@ -125,7 +125,7 @@ class TestInsertHeartbeatsToClickhouse:
         assert count == 0
 
     def test_received_at_becomes_explicit_timestamp(self):
-        # doc/known-limitations.md CC: ワーカー障害で滞留したheartbeatが復旧時に
+        # ワーカー障害で滞留したheartbeatが復旧時に
         # 一括INSERTされても、`_received_at`（FastAPI受信時刻）があれば挿入時刻
         # ではなく実際の受信時刻がtimestamp列に入ることを確認する。
         heartbeats = [{"node_id": "proposed", "status": "ok", "_received_at": 1755000000.0}]
@@ -142,7 +142,7 @@ class TestInsertHeartbeatsToClickhouse:
 
     def test_missing_received_at_omits_timestamp_key(self):
         # `_received_at`がない場合はtimestampキー自体を省略し、テーブルの
-        # DEFAULT now()に委ねる既存動作を変えない（後方互換性、内部指針 3.4）。
+        # DEFAULT now()に委ねる既存動作を変えない（後方互換性）。
         heartbeats = [{"node_id": "proposed", "status": "ok"}]
         captured = {}
 
@@ -185,7 +185,7 @@ def _capture_insert(events):
 
 
 class TestEventTimestampNormalization:
-    """#VV: UTCオフセット付きのイベント時刻は、オフセットを捨てず（=時刻がずれる）
+    """UTCオフセット付きのイベント時刻は、オフセットを捨てず（=時刻がずれる）
     UTCへ変換してから格納する。オフセットなしはUTCとみなす（従来どおり）。"""
 
     @pytest.mark.parametrize(
@@ -206,7 +206,7 @@ class TestEventTimestampNormalization:
 
 
 class TestInvalidEventsAreSeparated:
-    """#VV: severity・countが整数化できない等、行を組み立てられないイベントで
+    """severity・countが整数化できない等、行を組み立てられないイベントで
     例外を投げるとワーカーが落ち、RPOP済みのバッチ全体が消えていた。"""
 
     def test_poison_event_is_returned_separately_and_good_events_still_inserted(self):
@@ -243,7 +243,7 @@ class TestInvalidEventsAreSeparated:
 
 
 class TestShutdownDrain:
-    """#VV: シャットダウン時の最終ドレインでも、取り出したデータは挿入成功・再キュー・
+    """シャットダウン時の最終ドレインでも、取り出したデータは挿入成功・再キュー・
     隔離のいずれかに帰着する。"""
 
     @pytest.fixture

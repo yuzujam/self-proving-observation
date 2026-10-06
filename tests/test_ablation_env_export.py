@@ -2,7 +2,7 @@
 # └── tests/
 #     └── test_ablation_env_export.py
 #
-# doc/known-limitations.md #NN: run_ablation_experiment.sh が
+# run_ablation_experiment.sh が
 # docker-compose.ablation.yml の必須変数 ABLATION_DATA_DIR を、個別の
 # `docker compose ...` 呼び出しへ前置する形でしか渡しておらず、シェル自体に
 # export していなかった。そのため同じスクリプトがバックグラウンドジョブとして
@@ -53,7 +53,7 @@ def test_ablation_data_dir_is_exported_before_resource_py_is_launched():
 
     assert export_line_no is not None, (
         "run_ablation_experiment.sh に `export ABLATION_DATA_DIR=` が"
-        "見つかりません（doc/known-limitations.md #NN参照）。個別コマンドへの"
+        "見つかりません。個別コマンドへの"
         "前置だけでは、バックグラウンド起動されるresource.pyへ環境変数が"
         "伝播しません。"
     )
@@ -63,8 +63,8 @@ def test_ablation_data_dir_is_exported_before_resource_py_is_launched():
         "可能性があります。本テストの前提を見直してください）。"
     )
     assert export_line_no < resource_py_line_no, (
-        "`export ABLATION_DATA_DIR=` がresource.py起動より後ろにあります"
-        "（doc/known-limitations.md #NN参照）。resource.pyは独自に"
+        "`export ABLATION_DATA_DIR=` がresource.py起動より後ろにあります。"
+        "resource.pyは独自に"
         "`docker compose ps -q` を実行するため、起動時点でこの環境変数が"
         "既にexport済みでなければコンテナ検出に失敗し、ホスト全体の値へ"
         "サイレントにフォールバックします。"

@@ -2,10 +2,10 @@
 # └── tests/
 #     └── test_verification_failed_consistency.py
 #
-# doc/known-limitations.md #X: stats.pyがverification_failedの除外ロジックを
+# stats.pyがverification_failedの除外ロジックを
 # 実装し忘れ、ES 429による検証失敗が「100%欠損」として統計検定に混入した。
 # aggregate.py/batch_report.py/report.pyには既に除外ロジックがあったが、
-# 2026-07-15の全コード監査（#T）はこの1箇所を横展開で洗い出せず見落とした。
+# 2026-07-15の全コード監査はこの1箇所を横展開で洗い出せず見落とした。
 #
 # loss_rate_percentを読むモジュールが増えるたびに人間の記憶やレビューだけに
 # 頼って除外ロジックの有無を確認するのではなく、「loss_rate_percentを
@@ -26,5 +26,5 @@ def test_every_module_reading_loss_rate_percent_also_handles_verification_failed
 
     assert not offenders, (
         "loss_rate_percentを参照しているがverification_failedへの言及が"
-        f"見つからないファイル（doc/known-limitations.md #X参照）: {offenders}"
+        f"見つからないファイル: {offenders}"
     )

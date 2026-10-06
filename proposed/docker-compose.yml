@@ -112,8 +112,7 @@ services:
     volumes:
       - ./vector.toml:/etc/vector/vector.toml:ro
       - /var/log/suricata:/var/log/suricata:ro
-      # チェックポイント永続化（doc/known-limitations.md #DDD）。反映手順は
-      # doc/pipeline-spec.md「Vectorチェックポイントの永続化」参照（観測終了後）。
+      # チェックポイントの永続化（反映は観測終了後）。
       - vector_data:/var/lib/vector
     depends_on:
       redis:

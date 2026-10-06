@@ -96,7 +96,7 @@ class TestReceiveEvents:
         queued = [json.loads(v) for v in fake_redis.lists[REDIS_QUEUE_KEY]]
         assert len(queued) == 1
         assert queued[0]["sensor_id"] == "edge-1"
-        # イベント発生時刻は保持し、受信時刻は別フィールドとして付与する（内部指針 3.3）
+        # イベント発生時刻は保持し、受信時刻は別フィールドとして付与する
         assert queued[0]["timestamp"] == "2026-01-01T00:00:00"
         assert isinstance(queued[0]["_received_at"], float)
 
@@ -118,7 +118,7 @@ class TestReceiveEvents:
 
     @pytest.mark.parametrize("body", ['"abc"', "42", "null", "[1, 2]", "true"])
     def test_non_object_events_return_400_not_503(self, client, fake_redis, body):
-        # #XX: 以前は要素への`event["_received_at"] = ...`が例外となり、クライアントの
+        # 以前は要素への`event["_received_at"] = ...`が例外となり、クライアントの
         # 誤りが「503 queue unavailable」（サーバー障害、送信側は再送し続ける）として
         # 返り、例外文言も応答に含まれていた。
         resp = client.post("/events", content=body)
@@ -189,7 +189,7 @@ class TestReceiveHeartbeat:
 
     @pytest.mark.parametrize("body", ['"abc"', "42", "null", "[]", "[1]"])
     def test_non_object_heartbeat_returns_400(self, client, fake_redis, body):
-        # #XX: 以前は`payload.get`のAttributeErrorが未捕捉で500になっていた。
+        # 以前は`payload.get`のAttributeErrorが未捕捉で500になっていた。
         resp = client.post("/heartbeat", content=body)
 
         assert resp.status_code == 400

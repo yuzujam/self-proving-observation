@@ -232,8 +232,8 @@ class FidelityGuard:
             else:
                 shap_effective_threshold = None
                 # numpy.float64同士の比較はnumpy.bool_を返し、json.dump(default=str)で
-                # 文字列"False"（再読込すると真）になる。Pythonのboolへ揃える
-                # （doc/known-limitations.md #WW）。判定ロジック自体は無変更。
+                # 文字列"False"（再読込すると真）になる。Pythonのboolへ揃える。
+                # 判定ロジック自体は無変更。
                 drift_detected = bool(moving_avg < effective_threshold)
 
             result: dict[str, Any] = {
