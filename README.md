@@ -6,6 +6,7 @@
 
 2拠点・90日間のハニーポット長期観測で、欠損を隠さず、期間と規模を定量的に開示する。
 
+[![CI](https://github.com/yuzujam/self-proving-observation/actions/workflows/ci.yml/badge.svg)](https://github.com/yuzujam/self-proving-observation/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 [![Preprint DOI](https://img.shields.io/badge/preprint-10.5281%2Fzenodo.23092261-1682d4.svg)](https://doi.org/10.5281/zenodo.23092261)
 [![Code DOI](https://img.shields.io/badge/code-10.5281%2Fzenodo.23092332-1682d4.svg)](https://doi.org/10.5281/zenodo.23092332)
