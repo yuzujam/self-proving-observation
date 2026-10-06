@@ -1,6 +1,7 @@
 # self-proving-observation/
 # └── scripts/
-#     └── analyze_periodicity_final.py — 6.3章の正式分析（事前登録手順の実行、手順の事前登録は2026-09-30）
+#     └── analyze_periodicity_final.py — 6.3章の正式分析
+#         （事前登録手順の実行、手順の事前登録は2026-09-30）
 
 """S3-compatible object storageの日次Parquetから清浄日次件数を集計し、事前登録した検定を実行する。
 

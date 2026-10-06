@@ -2,8 +2,9 @@
 # └── tests/
 #     └── test_rotate_extract_pipeline.py
 #
-# rotate_and_backup.sh は「ESインデックス → 1分集計CSV(gzip) → S3-compatible object storage → ESから削除」
-# の順で処理する。以前は `python3 extract_features.py | gzip > f && [[ -s f ]]` と
+# rotate_and_backup.sh は「ESインデックス → 1分集計CSV(gzip) →
+# S3-compatible object storage → ESから削除」の順で処理する。
+# 以前は `python3 extract_features.py | gzip > f && [[ -s f ]]` と
 # 書かれており、パイプラインの終了ステータスが末尾のgzipのものになる（pipefail
 # なし）ため、extract_features.py の失敗（ES障害等）がマスクされていた。gzipは
 # 空入力でも20バイトの有効なファイルを作るので `-s` も通り、「抽出失敗→空の

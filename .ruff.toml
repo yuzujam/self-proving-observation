@@ -1,0 +1,27 @@
+# self-proving-observation/
+# └── .ruff.toml
+
+target-version = "py311"
+line-length = 100
+
+[lint]
+select = [
+    "E",    # pycodestyle errors
+    "W",    # pycodestyle warnings
+    "F",    # pyflakes
+    "I",    # isort
+    "S",    # bandit (security)
+    "B",    # flake8-bugbear
+    "UP",   # pyupgrade
+]
+ignore = [
+    "S310",  # audit-url-open (内部 API エンドポイントのみ使用)
+    "S603",  # subprocess-without-shell-check (プロジェクトでは list 形式を強制)
+    "S607",  # start-process-with-partial-path
+]
+
+[lint.isort]
+known-first-party = ["src"]
+
+[lint.per-file-ignores]
+"tests/*" = ["S101"]

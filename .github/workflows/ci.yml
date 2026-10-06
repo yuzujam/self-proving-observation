@@ -1,0 +1,50 @@
+name: CI
+
+# Lint and unit tests. Same conditions as the test run described in README-package.md
+# (Linux, Python 3.14, CPU-only PyTorch).
+on:
+  push:
+    branches: [ "main" ]
+    paths:
+      - "src/**"
+      - "scripts/**"
+      - "tests/**"
+      - "pyproject.toml"
+      - "requirements.txt"
+      - ".github/workflows/**"
+  pull_request:
+    branches: [ "main" ]
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.14"
+          cache: "pip"
+          cache-dependency-path: pyproject.toml
+
+      # CPU-only PyTorch keeps the install small (no CUDA wheels)
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install torch --index-url https://download.pytorch.org/whl/cpu
+          pip install -e ".[dev]"
+
+      - name: Lint (Ruff)
+        run: ruff check src/ scripts/ tests/
+
+      - name: Unit tests (pytest + coverage)
+        if: ${{ !cancelled() }}
+        run: pytest tests/ -q --cov

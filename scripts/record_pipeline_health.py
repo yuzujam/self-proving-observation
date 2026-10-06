@@ -5,8 +5,8 @@
 # 直近1時間の threat_events から件数・ユニークセンサー数を集計し、
 # あわせて threat_events_experiment の現在の行数・バイト数（system.parts の
 # active パーツ合計）も記録して、pipeline_health に1行追加する。後者は
-# TTL失効前のテーブル肥大化がClickHouse書き込み速度を低下させた事故を受けて追加した推移監視用の列（即時
-# アラートを担っていたscripts/check_experiment_table_growth.shは通知系
+# TTL失効前のテーブル肥大化がClickHouse書き込み速度を低下させた事故を受けて追加した
+# 推移監視用の列（即時アラートを担っていたscripts/check_experiment_table_growth.shは通知系
 # 撤去に伴い削除済み。この推移記録自体は維持）。
 # ClickHouse 側で完結する INSERT...SELECT のため呼び出し元は ClickHouse URL
 # のみ渡せばよい。
