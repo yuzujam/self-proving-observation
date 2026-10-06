@@ -9,7 +9,7 @@
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 [![Preprint DOI](https://img.shields.io/badge/preprint-10.5281%2Fzenodo.23092261-1682d4.svg)](https://doi.org/10.5281/zenodo.23092261)
 [![Code DOI](https://img.shields.io/badge/code-10.5281%2Fzenodo.23092332-1682d4.svg)](https://doi.org/10.5281/zenodo.23092332)
-![Python 3.11+](https://img.shields.io/badge/python-3.11%2B-3776ab.svg)
+![Python: tested on 3.14](https://img.shields.io/badge/python-3.14%20(tested)-3776ab.svg)
 ![Status: observation completed](https://img.shields.io/badge/status-observation%20completed-lightgrey.svg)
 
 [課題](#何を解いたか) · [設計](#どう解いたか) · [結果](#結果) · [限界](#限界隠さずに書く) · [コード](#このリポジトリの内容) · [English](#english-summary)
