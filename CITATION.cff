@@ -1,0 +1,29 @@
+cff-version: 1.2.0
+message: "If you use this code or the results of the study, please cite the preprint below."
+title: "Self-Proving Data Integrity for a Distributed, Autonomous Observation Platform"
+type: software
+authors:
+  - family-names: "Takahashi"
+    given-names: "Shotaro"
+license: MIT
+repository-code: "https://github.com/yuzujam/self-proving-observation"
+doi: "10.5281/zenodo.23092332"
+abstract: >-
+  Sanitized code and documentation of a two-site, 90-day honeypot observation platform in which every
+  site sends a one-minute heartbeat and observation gaps are recorded and disclosed instead of hidden.
+keywords:
+  - honeypot
+  - data integrity
+  - observability
+  - concept drift
+  - time series
+preferred-citation:
+  type: article
+  status: preprint
+  title: "Self-Proving Data Integrity for a Distributed, Autonomous Observation Platform"
+  authors:
+    - family-names: "Takahashi"
+      given-names: "Shotaro"
+  doi: "10.5281/zenodo.23092261"
+  year: 2026
+  notes: "Preprint on Zenodo. The DOI is the concept DOI and resolves to the latest version."
