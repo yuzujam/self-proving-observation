@@ -85,7 +85,7 @@
 
 ## 作者
 
-高橋 (yuzujam)。他の取り組みや連絡先は [プロフィール](https://github.com/yuzujam) を参照してください。
+yuzujam。他の取り組みや連絡先は [プロフィール](https://github.com/yuzujam) を参照してください。
 
 ---
 
