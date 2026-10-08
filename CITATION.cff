@@ -7,7 +7,7 @@ authors:
     given-names: "Shotaro"
 license: MIT
 repository-code: "https://github.com/yuzujam/self-proving-observation"
-doi: "10.5281/zenodo.23092332"
+doi: "10.5281/zenodo.23178244"
 abstract: >-
   Sanitized code and documentation of a two-site, 90-day honeypot observation platform in which every
   site sends a one-minute heartbeat and observation gaps are recorded and disclosed instead of hidden.
@@ -24,6 +24,6 @@ preferred-citation:
   authors:
     - family-names: "Takahashi"
       given-names: "Shotaro"
-  doi: "10.5281/zenodo.23092261"
+  doi: "10.5281/zenodo.23177927"
   year: 2026
-  notes: "Preprint on Zenodo. The DOI is the concept DOI and resolves to the latest version."
+  notes: "Preprint on Zenodo (version 4)."

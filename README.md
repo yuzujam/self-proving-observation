@@ -8,8 +8,8 @@
 
 [![CI](https://github.com/yuzujam/self-proving-observation/actions/workflows/ci.yml/badge.svg)](https://github.com/yuzujam/self-proving-observation/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
-[![Preprint DOI](https://img.shields.io/badge/preprint-10.5281%2Fzenodo.23092261-1682d4.svg)](https://doi.org/10.5281/zenodo.23092261)
-[![Code DOI](https://img.shields.io/badge/code-10.5281%2Fzenodo.23092332-1682d4.svg)](https://doi.org/10.5281/zenodo.23092332)
+[![Preprint DOI](https://img.shields.io/badge/preprint-10.5281%2Fzenodo.23177927-1682d4.svg)](https://doi.org/10.5281/zenodo.23177927)
+[![Code DOI](https://img.shields.io/badge/code-10.5281%2Fzenodo.23178244-1682d4.svg)](https://doi.org/10.5281/zenodo.23178244)
 ![Python: tested on 3.14](https://img.shields.io/badge/python-3.14%20(tested)-3776ab.svg)
 ![Status: observation completed](https://img.shields.io/badge/status-observation%20completed-lightgrey.svg)
 
@@ -82,6 +82,10 @@
 ## ライセンス
 
 コード: MIT（[`LICENSE`](LICENSE)）。プレプリント: CC BY 4.0。
+
+## 作者
+
+高橋 (yuzujam)。他の取り組みや連絡先は [プロフィール](https://github.com/yuzujam) を参照してください。
 
 ---
 

@@ -25,7 +25,7 @@ Row-level data and raw honeypot logs are not included (see the paper, Data and C
 
 ## Differences from the Zenodo code package
 
-This repository is based on the code package published on Zenodo (DOI 10.5281/zenodo.23092332), with
+This repository is based on the code package published on Zenodo (DOI 10.5281/zenodo.23178244), with
 three kinds of changes. None of them is intended to change what the code does.
 
 - **Neutral identifiers.** An internal project prefix in identifiers was replaced by `OBS` / `obs`:
