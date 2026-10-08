@@ -85,7 +85,7 @@
 
 ## 作者
 
-yuzujam。他の取り組みや連絡先は [プロフィール](https://github.com/yuzujam) を参照してください。
+Takahashi, Shotaro。他の取り組みや連絡先は [プロフィール](https://github.com/yuzujam) を参照してください。
 
 ---
 
